@@ -1,15 +1,15 @@
 from sqlalchemy import Column, Integer, String , TIMESTAMP , ForeignKey
-from database import Base
+from .database import Base
 from sqlalchemy.sql import func  
 
 class Users(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    fullname = Column(String(50), nullable=False)
-    username = Column(String(50), nullable=False)
-    email = Column(String(50),nullable=False)
-    password = Column(String(50),nullable=False)
+    fullname = Column(String(100), nullable=False)
+    username = Column(String(100), nullable=False)
+    email = Column(String(100),nullable=False)
+    password = Column(String(255),nullable=False)
     created_at = Column(TIMESTAMP,default=func.now())
     updated_at = Column(TIMESTAMP,default=func.now(),onupdate=func.now())
 
@@ -18,8 +18,9 @@ class Members(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
-    phone = Column(String(15), nullable=False)
+    phone = Column(String(10), nullable=False)
     email = Column(String(50),nullable=False)
+    address = Column(String(200),nullable=False)
     created_at = Column(TIMESTAMP,default=func.now())
     updated_at = Column(TIMESTAMP,default=func.now(),onupdate=func.now())
 

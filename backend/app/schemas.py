@@ -1,41 +1,43 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+from pydantic import EmailStr
 
 # User Pydantic Models
 class UserCreate(BaseModel):
     fullname: str
     username: str
-    email: str
+    email: EmailStr
     password: str
 
 class UserResponse(BaseModel):
     id: int
     fullname: str
     username: str
-    email: str
+    email: EmailStr
     created_at: datetime
     updated_at: datetime
 
     class Config:
-        orm_mode = True  # Tells Pydantic to treat SQLAlchemy models like dicts
+        from_attributes = True  # Tells Pydantic to treat SQLAlchemy models like dicts
 
 # Member Pydantic Models
 class MemberCreate(BaseModel):
     name: str
     phone: str
-    email: str
+    email: EmailStr
+    address : str
 
 class MemberResponse(BaseModel):
     id: int
     name: str
     phone: str
-    email: str
+    email: EmailStr
     created_at: datetime
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Book Pydantic Models
 class BookCreate(BaseModel):
@@ -56,7 +58,7 @@ class BookResponse(BaseModel):
     user_id: int  # Reference to the user who created the book
 
     class Config:
-        orm_mode = True
+       from_attributes = True
 
 # Borrowed Pydantic Models
 class BorrowedCreate(BaseModel):
@@ -71,4 +73,18 @@ class BorrowedResponse(BaseModel):
     returned_at: Optional[datetime]
 
     class Config:
-        orm_mode = True
+       from_attributes = True
+
+
+
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+    email: str
+    username: str

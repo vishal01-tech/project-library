@@ -1,26 +1,26 @@
-# Use the official Node.js image as the base image
+# Use official Node image
 FROM node:18
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first for caching dependencies
-COPY package*.json /app/
+# Copy package.json and lock file
+COPY package*.json ./
 
-# Install the dependencies (including Vite, React, etc.)
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the React source code
-COPY . /app/
+# Copy all source files
+COPY . .
 
-# Build the React app using Vite
+# Build the app
 RUN npm run build
 
-# Install a simple HTTP server to serve the built files
+# Install 'serve' to serve static files
 RUN npm install -g serve
 
-# Expose the port that the app will be served on
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Command to serve the built React app
+# Serve the built app
 CMD ["serve", "-s", "dist", "-l", "3000"]

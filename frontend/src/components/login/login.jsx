@@ -1,32 +1,54 @@
 import React, { useState } from "react";
-import "./login.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import './login.css'
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({ email: "", password: "", server: "" });
+  const navigate = useNavigate();
 
-  // Simple validation functions
+  // Email validation regex
   const validateEmail = (email) =>
     /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+  // Password validation (min 6 chars)
   const validatePassword = (password) => password.length >= 6;
 
-  // Handle input changes
   const handleChange = (e, field) => {
     const value = e.target.value;
     if (field === "email") setEmail(value);
     if (field === "password") setPassword(value);
-    setErrors((prev) => ({ ...prev, [field]: "" }));
+    setErrors((prev) => ({ ...prev, [field]: "", server: "" }));
   };
 
-  // Handle form submit
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    let valid = true;
-    let newErrors = { email: "", password: "" };
+  const handleBlur = (e, field) => {
+    const value = e.target.value;
+    let error = "";
 
-    // Check if email is valid
+    if (field === "email") {
+      if (!value.trim()) {
+        error = "Email is required.";
+      } else if (!validateEmail(value)) {
+        error = "Invalid email format.";
+      }
+    } else if (field === "password") {
+      if (!value.trim()) {
+        error = "Password is required.";
+      } else if (!validatePassword(value)) {
+        error = "Password must be at least 6 characters.";
+      }
+    }
+
+    setErrors((prev) => ({ ...prev, [field]: error, server: "" }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Reset errors
+    let newErrors = { email: "", password: "", server: "" };
+    let valid = true;
+
     if (!email.trim()) {
       newErrors.email = "Email is required.";
       valid = false;
@@ -35,7 +57,6 @@ const Login = () => {
       valid = false;
     }
 
-    // Check if password is valid
     if (!password.trim()) {
       newErrors.password = "Password is required.";
       valid = false;
@@ -46,29 +67,36 @@ const Login = () => {
 
     setErrors(newErrors);
 
-    // If valid, submit the form; otherwise, show errors
-    if (valid) {
-      console.log("Form submitted");
-      // You can handle the form submission logic here, like redirecting or calling an API
-      setEmail("");
-      setPassword("");
-      setErrors({ email: "", password: "" });
-    }
-  };
+    if (!valid) return;
 
-  // Handle blur (validation)
-  const handleBlur = (field) => {
-    if (field === "email" && !email.trim()) {
-      setErrors((prev) => ({ ...prev, email: "Email is required." }));
-    } else if (field === "password" && !password.trim()) {
-      setErrors((prev) => ({ ...prev, password: "Password is required." }));
-    } else if (field === "email" && !validateEmail(email)) {
-      setErrors((prev) => ({ ...prev, email: "Invalid email format." }));
-    } else if (field === "password" && !validatePassword(password)) {
-      setErrors((prev) => ({
-        ...prev,
-        password: "Password must be at least 6 characters.",
-      }));
+    try {
+      const response = await fetch("http://127.0.0.1:8000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setErrors((prev) => ({ ...prev, server: "Invalid credentials" }));
+        } else {
+          setErrors((prev) => ({ ...prev, server: "Server error" }));
+        }
+        return;
+      }
+
+      const data = await response.json();
+
+      // Store token for future authenticated requests
+      localStorage.setItem("access_token", data.access_token);
+
+      // Redirect to a protected page (home)
+      navigate("/home");
+    } catch (error) {
+      setErrors((prev) => ({ ...prev, server: "Network error" }));
+      console.error("Login error:", error);
     }
   };
 
@@ -84,7 +112,7 @@ const Login = () => {
       </nav>
 
       <div className="img">
-        <img src="./images/image.png" alt="image not found" />
+        <img src="./images/image.png" alt="Library" />
       </div>
 
       <div className="login-container">
@@ -101,7 +129,7 @@ const Login = () => {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => handleChange(e, "email")}
-              onBlur={() => handleBlur("email")}
+              onBlur={(e) => handleBlur(e, "email")} // Trigger validation on blur
               required
             />
             {errors.email && (
@@ -119,13 +147,15 @@ const Login = () => {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => handleChange(e, "password")}
-              onBlur={() => handleBlur("password")}
+              onBlur={(e) => handleBlur(e, "password")} // Trigger validation on blur
               required
             />
             {errors.password && (
               <span className="error-message">{errors.password}</span>
             )}
           </div>
+
+          {errors.server && <div className="server-error">{errors.server}</div>}
 
           <div className="btn">
             <button type="submit">Log In</button>

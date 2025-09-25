@@ -17,10 +17,9 @@ ACCESS_TOKEN_TIME = int(os.getenv("ACCESS_TOKEN_TIME"))
 # to create the jwt access token
 def create_access_token(data : dict,time_delta : None):
     to_encode = data.copy()
-    expire = datetime.utcnow + time_delta(minutes = 30)
-
+    expire = datetime.datetime.now() + time_delta  
     to_encode.update({"exp":expire})
-    encoded_jwt = jwt.encode(to_encode,SECRET_KEY,ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode,SECRET_KEY,algorithm = ALGORITHM)
 
     return encoded_jwt
 
