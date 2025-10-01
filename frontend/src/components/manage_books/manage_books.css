@@ -13,27 +13,27 @@ body {
     margin: 0;
 }
 
-.add-member-img {
+.manage-img {
     width: 100px;
     height: 20vh;
     margin-left: 300px;
 }
 
-.add-member-img img {
+.manage-img img {
     height: 500px;
     width: 400px;
     margin-top: 150px;
     margin-left: 300px;
 }
 
-.add-member-form {
+.manage-container {
     width: 350px;
     padding: 30px;
     border-radius: 12px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-bottom: 100px;
+    margin-bottom: 200px;
     height: 400px;
     margin-right: 700px;
 }
@@ -45,6 +45,9 @@ h2 {
     margin-bottom: 20px;
 }
 
+.input-group {
+    margin-bottom: 50px;
+}
 
 .form-group {
     position: relative; 
@@ -87,7 +90,6 @@ h2 {
     background-color: #333333;
     color: white;
     border: none;
-    margin-top: 10px;
     border-radius: 10px;
     cursor: pointer;
 }
@@ -100,4 +102,12 @@ p {
 
 span {
     color: red;
+}
+select{
+    width: 100%;
+    padding: 15px;
+    background-color: #636060;
+    color: #f0f0e6;
+    border: none;
+    border-radius: 10px;
 }

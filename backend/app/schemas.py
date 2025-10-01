@@ -44,9 +44,7 @@ class BookCreate(BaseModel):
     title: str
     author: str
     quantity: int
-    available_quantity: int
     category: str
-    user_id: int
 
 class BookResponse(BaseModel):
     id: int
@@ -78,7 +76,7 @@ class BorrowedResponse(BaseModel):
 
 
 
-
+# Login pydantic model
 class UserLogin(BaseModel):
     email: EmailStr
     password: str

@@ -5,6 +5,7 @@ import Forgotpassword from "./components/forgot_password/forgot_password";
 import ResetPassword from "./components/reset_password/reset_password";
 import Home from "./components/home/Home";
 import AddMember from "./components/add_member/add_member";
+import ManageBooks from "./components/manage_books/manage_books";
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
         <Route path="/resetpassword" element={<ResetPassword />} />
         <Route path="/home" element={<Home />} />
         <Route path="/addmember" element={<AddMember/>} />
-        <Route path="/managebooks" element={<manage_books />} />
+        <Route path="/managebooks" element={<ManageBooks />} />
         <Route path="/issuebooks" element={<issue_books />} />
       </Routes>
     </Router>

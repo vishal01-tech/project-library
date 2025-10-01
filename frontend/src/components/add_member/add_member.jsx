@@ -44,7 +44,7 @@ const AddMember = () => {
   };
 
   const validateForm = () => {
-    const fieldNames = ["name", "phone", "email"];
+    const fieldNames = ["name", "phone", "email","address"];
     const newErrors = {};
 
     fieldNames.forEach((field) => {

@@ -4,8 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from app.database import SessionLocal
-from app.models import Users , Members
-from app.schemas import UserLogin, TokenResponse , UserCreate  , MemberCreate
+from app.models import Users , Members , Books
+from app.schemas import UserLogin, TokenResponse , UserCreate  , MemberCreate , BookCreate
 from app.auth import create_access_token
 from datetime import timedelta
 
@@ -14,7 +14,7 @@ app = FastAPI()
 # CORS setup for your frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,7 +48,7 @@ def login(user_login: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     token_data = {"sub": user.email}
-    access_token = create_access_token(data=token_data, time_delta=timedelta(minutes=15))
+    access_token = create_access_token(data=token_data, time_delta=timedelta(minutes=30))
 
     return {"access_token": access_token,"token_type": "bearer","email": user.email,"username": user.username}
 
@@ -102,3 +102,20 @@ def add_member(member : MemberCreate , db: Session = Depends(get_db)):
     db.add(new_member)
     db.commit()
     db.refresh(new_member)
+
+
+    
+# add books api
+@app.post("/addbooks")
+def add_books(books : BookCreate , db: Session = Depends(get_db)):
+    # create new member
+    new_books = Books(
+        title = books.title,
+        author = books.author,
+        quantity = books.quantity,
+        category = books.category
+    )
+
+    db.add(new_books)
+    db.commit()
+    db.refresh(new_books)

@@ -7,11 +7,7 @@ const Home = () => {
     <div className="home">
       <header className="header">
         <h1>The Chapter House</h1>
-        <nav>
-          <Link to="/addmember">Add Member</Link>
-          <Link to="/managebooks">Manage Books</Link>
-          <Link to="/managebooks">Manage Books</Link>
-        </nav>
+        <Link to="/"><button className="log-out">Log Out</button></Link>
       </header>
       <div className="main">
         <div className="card" id="add-member">

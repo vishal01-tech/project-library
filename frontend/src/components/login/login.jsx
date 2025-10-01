@@ -1,67 +1,63 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import './login.css'
+import "./login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({ email: "", password: "", server: "" });
+  const [errors, setErrors] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
-  // Email validation regex
-  const validateEmail = (email) =>
-    /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
-  // Password validation (min 6 chars)
-  const validatePassword = (password) => password.length >= 6;
+  // Generic validation function
+  const validateField = (value, field) => {
+    switch (field) {
+      case "email":
+        if (!value.trim()) return "Email is required.";
+        if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value))
+          return "Invalid email format.";
+        break;
+      case "password":
+        if (!value.trim())
+          return "Password is required.";
+        if (value.length < 6)
+          return "Password must be at least 6 characters.";
+        break;
+      default:
+        return "";
+    }
+    return "";
+  };
 
   const handleChange = (e, field) => {
     const value = e.target.value;
     if (field === "email") setEmail(value);
     if (field === "password") setPassword(value);
-    setErrors((prev) => ({ ...prev, [field]: "", server: "" }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const handleBlur = (e, field) => {
     const value = e.target.value;
-    let error = "";
-
-    if (field === "email") {
-      if (!value.trim()) {
-        error = "Email is required.";
-      } else if (!validateEmail(value)) {
-        error = "Invalid email format.";
-      }
-    } else if (field === "password") {
-      if (!value.trim()) {
-        error = "Password is required.";
-      } else if (!validatePassword(value)) {
-        error = "Password must be at least 6 characters.";
-      }
-    }
-
-    setErrors((prev) => ({ ...prev, [field]: error, server: "" }));
+    const error = validateField(value, field);
+    setErrors((prev) => ({ ...prev, [field]: error }));
   };
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    // Reset errors
-    let newErrors = { email: "", password: "", server: "" };
+    // Reset errors before submission
+    let newErrors = { email: "", password: "" };
     let valid = true;
 
-    if (!email.trim()) {
-      newErrors.email = "Email is required.";
-      valid = false;
-    } else if (!validateEmail(email)) {
-      newErrors.email = "Invalid email format.";
+    // Validate both fields
+    const emailError = validateField(email, "email");
+    const passwordError = validateField(password, "password");
+
+    if (emailError) {
+      newErrors.email = emailError;
       valid = false;
     }
-
-    if (!password.trim()) {
-      newErrors.password = "Password is required.";
-      valid = false;
-    } else if (!validatePassword(password)) {
-      newErrors.password = "Password must be at least 6 characters.";
+    if (passwordError) {
+      newErrors.password = passwordError;
       valid = false;
     }
 
@@ -80,9 +76,7 @@ const Login = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setErrors((prev) => ({ ...prev, server: "Invalid credentials" }));
-        } else {
-          setErrors((prev) => ({ ...prev, server: "Server error" }));
+          setErrors((prev) => ({ ...prev, email: "Invalid credentials" }));
         }
         return;
       }
@@ -92,13 +86,11 @@ const Login = () => {
       // Store token for future authenticated requests
       localStorage.setItem("access_token", data.access_token);
 
-      // Redirect to a protected page (home)
+      // Redirect to home page after successful login
       navigate("/home");
     } catch (error) {
-      setErrors((prev) => ({ ...prev, server: "Network error" }));
-      console.error("Login error:", error);
     }
-  };
+  }
 
   return (
     <>
@@ -129,7 +121,7 @@ const Login = () => {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => handleChange(e, "email")}
-              onBlur={(e) => handleBlur(e, "email")} // Trigger validation on blur
+              onBlur={(e) => handleBlur(e, "email")}
               required
             />
             {errors.email && (
@@ -147,15 +139,13 @@ const Login = () => {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => handleChange(e, "password")}
-              onBlur={(e) => handleBlur(e, "password")} // Trigger validation on blur
+              onBlur={(e) => handleBlur(e, "password")}
               required
             />
             {errors.password && (
               <span className="error-message">{errors.password}</span>
             )}
           </div>
-
-          {errors.server && <div className="server-error">{errors.server}</div>}
 
           <div className="btn">
             <button type="submit">Log In</button>
