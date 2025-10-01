@@ -1,0 +1,98 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0e6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.issue-books-img {
+    width: 100px;
+    height: 20vh;
+    margin-left: 300px;
+}
+
+.issue-books-img img {
+    height: 500px;
+    width: 400px;
+    margin-top: 150px;
+    margin-left: 300px;
+}
+
+.issue-books-form {
+    width: 350px;
+    padding: 30px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 100px;
+    height: 400px;
+    margin-right: 700px;
+}
+
+h2 {
+    text-align: center;
+    color: #333333;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 5px;
+    color: #000000;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border: 2px solid #f0f0e6;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    color: #333333;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+    position: absolute;
+}
+
+.button {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    background-color: #333333;
+    color: white;
+    border: none;
+    margin-top: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.message {
+    color: green;
+    margin-top: 10px;
+    text-align: center;
+}
+
+span {
+    color: red;
+}

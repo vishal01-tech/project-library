@@ -7,7 +7,7 @@ class Borrowed(Base):
     __tablename__ = "borrowed_books"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'))  
+    member_id = Column(Integer, ForeignKey('members.id'))
     book_id = Column(Integer, ForeignKey('books.id'))  
     borrowed_at = Column(TIMESTAMP,default=func.now())
-    returned_at = Column(TIMESTAMP,default=func.now(),onupdate=func.now())
+    returned_at = Column(TIMESTAMP, nullable=True)

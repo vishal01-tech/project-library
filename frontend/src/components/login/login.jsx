@@ -95,7 +95,7 @@ const Login = () => {
   return (
     <>
       <nav className="nav">
-        <h3>Chapter House</h3>
+        <h3>LibraryApp</h3>
         <div className="sign-up">
           <p>
             Don't have an account? <Link to="/signup">Sign Up</Link>

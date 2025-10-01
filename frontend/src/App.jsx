@@ -6,6 +6,7 @@ import ResetPassword from "./components/reset_password/reset_password";
 import Home from "./components/home/Home";
 import AddMember from "./components/add_member/add_member";
 import ManageBooks from "./components/manage_books/manage_books";
+import IssueBooks from "./components/issue_books/issue_books";
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/addmember" element={<AddMember/>} />
         <Route path="/managebooks" element={<ManageBooks />} />
-        <Route path="/issuebooks" element={<issue_books />} />
+        <Route path="/issuebooks" element={<IssueBooks />} />
       </Routes>
     </Router>
   );

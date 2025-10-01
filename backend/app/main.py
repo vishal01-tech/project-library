@@ -4,9 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from app.database import SessionLocal
-from app.models import Users , Members , Books
-from app.schemas import UserLogin, TokenResponse , UserCreate  , MemberCreate , BookCreate
-from app.auth import create_access_token
+from .models import Users , Members , Books, Borrowed
+from app.schemas import UserLogin, TokenResponse , UserCreate  , MemberCreate , BookCreate, BorrowedCreate
+from app.utils.auth import create_access_token
 from datetime import timedelta
 
 app = FastAPI()
@@ -119,3 +119,50 @@ def add_books(books : BookCreate , db: Session = Depends(get_db)):
     db.add(new_books)
     db.commit()
     db.refresh(new_books)
+
+
+# GET members
+@app.get("/members")
+def get_members(db: Session = Depends(get_db)):
+    members = db.query(Members).all()
+    return members
+
+
+# GET books
+@app.get("/books")
+def get_books(db: Session = Depends(get_db)):
+    books = db.query(Books).all()
+    return books
+
+
+# POST issue book
+@app.post("/issuebook")
+def issue_book(borrowed: BorrowedCreate, db: Session = Depends(get_db)):
+    # Check if member exists
+    member = db.query(Members).filter(Members.id == borrowed.member_id).first()
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    # Check if book exists and has quantity > 0
+    book = db.query(Books).filter(Books.id == borrowed.book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    if book.quantity <= 0:
+        raise HTTPException(status_code=400, detail="Book not available")
+
+    # Check if already borrowed (optional, but good to check)
+    existing = db.query(Borrowed).filter(Borrowed.member_id == borrowed.member_id, Borrowed.book_id == borrowed.book_id, Borrowed.returned_at.is_(None)).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Book already borrowed by this member")
+
+    # Create borrowed record
+    new_borrowed = Borrowed(
+        member_id=borrowed.member_id,
+        book_id=borrowed.book_id
+    )
+
+    db.add(new_borrowed)
+    db.commit()
+    db.refresh(new_borrowed)
+
+    # Decrease quantity
