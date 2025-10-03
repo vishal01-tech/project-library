@@ -1,41 +1,131 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import './Home.css'
 import { Link } from "react-router-dom";
 
 const Home = () => {
+  const [books, setBooks] = useState([]);
+  const [userRole, setUserRole] = useState('user');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    // Get user role from localStorage or cookie
+    const role = localStorage.getItem('userRole') || 'user';
+    setUserRole(role);
+
+    // Fetch books
+    fetchBooks();
+  }, []);
+
+  const fetchBooks = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/books");
+      const data = await response.json();
+      setBooks(data);
+    } catch (error) {
+      console.error("Failed to fetch books:", error);
+    }
+  };
+
+  const handleAddBook = async (bookId) => {
+    await fetchBooks();
+  };
+
+  const handleDeleteBook = async (bookId) => {
+    if (window.confirm('Are you sure you want to delete this book?')) {
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/books/${bookId}`, {
+          method: 'DELETE',
+        });
+        if (response.ok) {
+          await fetchBooks();
+        } else {
+          alert('Failed to delete book');
+        }
+      } catch (error) {
+        console.error("Failed to delete book:", error);
+        alert('Failed to delete book');
+      }
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+    // Clear any other auth data
+  };
+
   return (
     <div className="home">
-      <header className="header">
-        <h1>The Chapter House</h1>
-        <Link to="/"><button className="log-out">Log Out</button></Link>
-      </header>
-      <div className="main">
-        <div className="card" id="add-member">
-          <img
-            src="https://static.vecteezy.com/system/resources/previews/023/087/351/non_2x/add-user-icon-in-line-style-social-media-button-concept-vector.jpg"
-            alt="image not found"
-          />
-          <Link to="/addmember">
-            <button className="button">Add Member</button>
+      {/* Navbar */}
+      <nav className="navbar">
+        <div className="navbar-left">
+          <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            ☰
+          </button>
+          <h1>The Chapter House</h1>
+        </div>
+        <div className="navbar-right">
+          <Link to="/" onClick={handleLogout}>
+            <button className="log-out">Log Out</button>
           </Link>
         </div>
-        <div className="card" id="manage-books">
-          <img
-            src="https://marketplace.canva.com/D3qec/MAES6PD3qec/1/tl/canva-stack-of-books-icon-MAES6PD3qec.png"
-            alt="image not found"
-          />
-          <Link to="/managebooks">
-            <button className="button">Manage Books</button>
+      </nav>
+
+      {/* Sidebar */}
+      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-content">
+          <Link to="/addmember" className="sidebar-link">
+            <span></span> Add Member
           </Link>
+          <Link to="/managebooks" className="sidebar-link">
+            <span></span> Manage Books
+          </Link>
+          <Link to="/issuebooks" className="sidebar-link">
+            <span></span> Issue Books
+          </Link>
+          {userRole === 'super_admin' && (
+            <Link to="/signup" className="sidebar-link">
+              <span></span> Add User
+            </Link>
+          )}
         </div>
-        <div className="card" id="issue-books">
-          <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQFeViYTjhHjVaD3LVGvk0bLnozowz2hVtUw&s"
-            alt="image not found"
-          />
-          <Link to="/issuebooks">
-            <button className="button">Issue Books</button>
-          </Link>
+      </div>
+
+      {/* Main Content */}
+      <div className="main-content">
+        <div className="books-grid">
+          {books.map((book) => (
+            <div key={book.id} className="book-card">
+              <div className="book-image">
+                <img
+                  src={`http://127.0.0.1:8000${book.image}`}
+                  alt={book.title}
+                  onError={(e) => {
+                    e.target.src = '/images/image.png';
+                  }}
+                />
+              </div>
+              <div className="book-info">
+                <h3>{book.title}</h3>
+                <p className="author">by {book.author}</p>
+                <p className="category">{book.category}</p>
+                <p className="quantity">Available: {book.quantity}</p>
+              </div>
+              <div className="book-actions">
+                <button
+                  className="action-btn add-btn"
+                  onClick={() => handleAddBook(book.id)}
+                >
+                  Add
+                </button>
+                <button
+                  className="action-btn delete-btn"
+                  onClick={() => handleDeleteBook(book.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

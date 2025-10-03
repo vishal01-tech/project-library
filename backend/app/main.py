@@ -1,15 +1,23 @@
-# main.py
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
+import os
+import shutil
+
+# Ensure uploads directory exists
+os.makedirs("app/uploads", exist_ok=True)
 from app.database import SessionLocal
 from .models import Users , Members , Books, Borrowed
-from app.schemas import UserLogin, TokenResponse , UserCreate  , MemberCreate , BookCreate, BorrowedCreate
-from app.utils.auth import create_access_token
+from app.schemas import UserLogin, TokenResponse , UserCreate  , MemberCreate , BookCreate, BookUpdate, BorrowedCreate
+from app.utils.auth import create_access_token, get_current_user_with_role, verify_access_token
 from datetime import timedelta
 
 app = FastAPI()
+
+# Mount static files for uploaded images
+app.mount("/uploads", StaticFiles(directory="app/uploads"), name="uploads")
 
 # CORS setup for your frontend
 app.add_middleware(
@@ -50,17 +58,38 @@ def login(user_login: UserLogin, db: Session = Depends(get_db)):
     token_data = {"sub": user.email}
     access_token = create_access_token(data=token_data, time_delta=timedelta(minutes=30))
 
-    return {"access_token": access_token,"token_type": "bearer","email": user.email,"username": user.username}
+    return {"access_token": access_token,"token_type": "bearer","email": user.email,"username": user.username,"role": user.role}
 
 
-# Signup API
-
+# Signup API - Only super_admin can create users, except for the first user which can be super_admin
 @app.post("/signup")
-def signup(user: UserCreate, db: Session = Depends(get_db)):
+def signup(user: UserCreate, request: Request, db: Session = Depends(get_db)):
     # Check if user already exists
     existing_user = db.query(Users).filter(Users.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
+
+    # Check if any users exist
+    user_count = db.query(Users).count()
+    if user_count == 0:
+        # First user, allow super_admin role
+        if user.role != "super_admin":
+            raise HTTPException(status_code=400, detail="First user must be super_admin")
+    else:
+        # Allow creation of 'user' role without authentication
+        if user.role == "user":
+            pass
+        else:
+            # Subsequent users require super_admin authentication for other roles
+            token = request.cookies.get("access_token")
+            if not token:
+                raise HTTPException(status_code=401, detail="Not authenticated")
+            payload = verify_access_token(token)
+            if not payload:
+                raise HTTPException(status_code=401, detail="Invalid token")
+            current_user = db.query(Users).filter(Users.email == payload.get("sub")).first()
+            if not current_user or current_user.role != "super_admin":
+                raise HTTPException(status_code=403, detail="Insufficient permissions")
 
     # Hash password
     hashed_password = pwd_context.hash(user.password)
@@ -71,6 +100,7 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
         username=user.username,
         email=user.email,
         password=hashed_password,
+        role=user.role
     )
 
     db.add(new_user)
@@ -107,18 +137,40 @@ def add_member(member : MemberCreate , db: Session = Depends(get_db)):
     
 # add books api
 @app.post("/addbooks")
-def add_books(books : BookCreate , db: Session = Depends(get_db)):
-    # create new member
+def add_books(
+    title: str = Form(...),
+    author: str = Form(...),
+    quantity: str = Form(...),
+    category: str = Form(...),
+    image: UploadFile = File(None),
+    db: Session = Depends(get_db)
+):
+    try:
+        quantity_int = int(quantity)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Quantity must be a valid integer")
+
+    image_path = None
+    if image:
+        # Save the uploaded file
+        file_location = f"app/uploads/{image.filename}"
+        with open(file_location, "wb") as file_object:
+            shutil.copyfileobj(image.file, file_object)
+        image_path = f"/uploads/{image.filename}"
+
+    # create new book
     new_books = Books(
-        title = books.title,
-        author = books.author,
-        quantity = books.quantity,
-        category = books.category
+        title=title,
+        author=author,
+        quantity=quantity_int,
+        category=category,
+        image=image_path
     )
 
     db.add(new_books)
     db.commit()
     db.refresh(new_books)
+    return {"message": "Book added successfully"}
 
 
 # GET members
@@ -150,7 +202,7 @@ def issue_book(borrowed: BorrowedCreate, db: Session = Depends(get_db)):
     if book.quantity <= 0:
         raise HTTPException(status_code=400, detail="Book not available")
 
-    # Check if already borrowed (optional, but good to check)
+    # Check if already borrowed
     existing = db.query(Borrowed).filter(Borrowed.member_id == borrowed.member_id, Borrowed.book_id == borrowed.book_id, Borrowed.returned_at.is_(None)).first()
     if existing:
         raise HTTPException(status_code=400, detail="Book already borrowed by this member")
@@ -166,3 +218,96 @@ def issue_book(borrowed: BorrowedCreate, db: Session = Depends(get_db)):
     db.refresh(new_borrowed)
 
     # Decrease quantity
+    book.quantity -= 1
+    db.commit()
+
+    return {"message": "Book issued successfully"}
+
+
+# PUT update book
+@app.put("/books/{book_id}")
+def update_book(
+    book_id: int,
+    title: str = Form(None),
+    author: str = Form(None),
+    quantity: str = Form(None),
+    category: str = Form(None),
+    image: UploadFile = File(None),
+    db: Session = Depends(get_db)
+):
+    book = db.query(Books).filter(Books.id == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    if title is not None:
+        book.title = title
+    if author is not None:
+        book.author = author
+    if quantity is not None:
+        try:
+            quantity_int = int(quantity)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Quantity must be a valid integer")
+        book.quantity = quantity_int
+    if category is not None:
+        book.category = category
+    if image:
+        # Save the uploaded file
+        file_location = f"app/uploads/{image.filename}"
+        with open(file_location, "wb") as file_object:
+            shutil.copyfileobj(image.file, file_object)
+        book.image = f"/uploads/{image.filename}"
+
+    db.commit()
+    db.refresh(book)
+    return book
+
+
+# DELETE book
+@app.delete("/books/{book_id}")
+def delete_book(book_id: int, db: Session = Depends(get_db)):
+    book = db.query(Books).filter(Books.id == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    # Check if the book is currently borrowed
+    borrowed_count = db.query(Borrowed).filter(Borrowed.book_id == book_id, Borrowed.returned_at.is_(None)).count()
+    if borrowed_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete book that is currently borrowed.")
+
+    db.delete(book)
+    db.commit()
+    return {"message": "Book deleted successfully"}
+
+
+# POST return book
+@app.post("/returnbook")
+def return_book(borrowed_id: int, db: Session = Depends(get_db)):
+    borrowed = db.query(Borrowed).filter(Borrowed.id == borrowed_id, Borrowed.returned_at.is_(None)).first()
+    if not borrowed:
+        raise HTTPException(status_code=404, detail="Borrowed record not found or already returned")
+
+    # Update return date
+    from datetime import datetime
+    borrowed.returned_at = datetime.utcnow()
+
+    # Increase book quantity
+    book = db.query(Books).filter(Books.id == borrowed.book_id).first()
+    if book:
+        book.quantity += 1
+
+    db.commit()
+    return {"message": "Book returned successfully"}
+
+
+# GET borrowed books
+@app.get("/borrowed")
+def get_borrowed_books(db: Session = Depends(get_db)):
+    borrowed = db.query(Borrowed).filter(Borrowed.returned_at.is_(None)).all()
+    return borrowed
+
+# GET check if any users exist
+@app.get("/users/exists")
+def users_exist(db: Session = Depends(get_db)):
+    user_count = db.query(Users).count()
+    return {"exists": user_count > 0}

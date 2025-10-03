@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String 
+from sqlalchemy import Column, Integer, String
 from app.database import Base
 
 class Books(Base):
@@ -9,3 +9,4 @@ class Books(Base):
     author = Column(String(50), nullable=False)
     quantity = Column(Integer,nullable=False)
     category = Column(String(50),nullable=False)
+    image = Column(String(255), nullable=True)  # URL or path to book image

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./signup.css";
 
@@ -8,10 +8,25 @@ const SignUp = () => {
     username: "",
     email: "",
     password: "",
+    role: "user",
   });
 
   const [errors, setErrors] = useState({});
+  const [usersExist, setUsersExist] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkUsersExist = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/users/exists");
+        const result = await response.json();
+        setUsersExist(result.exists);
+      } catch (err) {
+        console.error("Error checking if users exist:", err);
+      }
+    };
+    checkUsersExist();
+  }, []);
 
   const validateField = (name, value) => {
     let message = "";
@@ -87,6 +102,7 @@ const SignUp = () => {
           username: "",
           email: "",
           password: "",
+          role: "user",
         });
         navigate("/"); // Redirect to login
       } else {
@@ -171,6 +187,20 @@ const SignUp = () => {
             {errors.password && (
               <span className="error">{errors.password}</span>
             )}
+          </div>
+
+          <div className="form-group">
+            <label>
+              Role <span>*</span>
+            </label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+            >
+              <option value="user">User</option>
+              {!usersExist && <option value="super_admin">Super Admin</option>}
+            </select>
           </div>
 
           <button type="submit" className="button">

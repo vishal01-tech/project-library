@@ -11,9 +11,11 @@ class TokenResponse(BaseModel):
     token_type: str
     email: str
     username: str
+    role: str
 
 class UserCreate(BaseModel):
     fullname: str
     username: str
     email: EmailStr
     password: str
+    role: str = "user"  # Default role

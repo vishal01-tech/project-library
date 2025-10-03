@@ -1,18 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./manage_books.css";
 
 const ManageBooks = () => {
-  const [FormData, setFormdata] = useState({
+  const [books, setBooks] = useState([]);
+  const [editingBook, setEditingBook] = useState(null);
+  const [formData, setFormdata] = useState({
     title: "",
     author: "",
     quantity: "",
-    category: ""
+    category: "",
+    image: null,
   });
-
+  const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  const fetchBooks = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/books");
+      const data = await response.json();
+      setBooks(data);
+    } catch (error) {
+      console.error("Failed to fetch books:", error);
+    }
+  };
+
+  // Validate individual fields
   const validateField = (name, value) => {
     let message = "";
 
@@ -36,22 +54,21 @@ const ManageBooks = () => {
           break;
       }
     }
-
-    setErrors((prev) => ({ ...prev, [name]: message }));
+    return message;
   };
 
+  // Validate all form fields
   const validateForm = () => {
-    const fieldNames = ["title", "author", "quantity", "category"];
     const newErrors = {};
+    const fieldNames = ["title", "author", "quantity", "category"];
 
     fieldNames.forEach((field) => {
-      const fieldValue = FormData[field]; // Correct this to FormData
-      validateField(field, fieldValue);
-
-      if (!fieldValue || fieldValue.trim() === "" || errors[field]) {
-        newErrors[field] = errors[field] || "This field is required";
-      }
+      const fieldValue = formData[field];
+      const message = validateField(field, fieldValue);
+      if (message) newErrors[field] = message;
     });
+
+    setErrors(newErrors);
 
     return Object.keys(newErrors).length === 0;
   };
@@ -64,7 +81,8 @@ const ManageBooks = () => {
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
-    validateField(name, value);
+    const error = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
   const handleSubmit = async (e) => {
@@ -72,31 +90,101 @@ const ManageBooks = () => {
     if (!validateForm()) return;
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/addbooks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(FormData),
+      const url = editingBook
+        ? `http://127.0.0.1:8000/books/${editingBook.id}`
+        : "http://127.0.0.1:8000/addbooks";
+      const method = editingBook ? "PUT" : "POST";
+
+      const formDataToSend = new FormData();
+      formDataToSend.append("title", formData.title);
+      formDataToSend.append("author", formData.author);
+      formDataToSend.append("quantity", formData.quantity);
+      formDataToSend.append("category", formData.category);
+      if (formData.image) {
+        formDataToSend.append("image", formData.image);
+      }
+
+      const response = await fetch(url, {
+        method: method,
+        body: formDataToSend,
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        alert("Book added successfully");
+        alert(
+          editingBook ? "Book updated successfully" : "Book added successfully"
+        );
         setFormdata({
           title: "",
           author: "",
           quantity: "",
           category: "",
+          image: null,
         });
-        navigate("/managebooks");
+        setImagePreview(null);
+        setEditingBook(null);
+        fetchBooks();
       } else {
-        alert(result.detail || "Failed to add books");
+        console.error("Error response:", result);
+        alert(result.detail || "Failed to save book");
       }
     } catch (err) {
+      console.error("Error during fetch:", err);
       alert("Please try again");
     }
+  };
+
+  const handleEdit = (book) => {
+    setEditingBook(book);
+    setFormdata({
+      title: book.title,
+      author: book.author,
+      quantity: book.quantity.toString(),
+      category: book.category,
+      image: null,
+    });
+    // Set preview to existing image if available
+    if (book.image) {
+      setImagePreview(
+        book.image.startsWith("/uploads")
+          ? `http://127.0.0.1:8000${book.image}`
+          : book.image
+      );
+    } else {
+      setImagePreview(null);
+    }
+  };
+
+  const handleDelete = async (bookId) => {
+    if (window.confirm("Are you sure you want to delete this book?")) {
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/books/${bookId}`, {
+          method: "DELETE",
+        });
+        if (response.ok) {
+          alert("Book deleted successfully");
+          fetchBooks();
+        } else {
+          alert("Failed to delete book");
+        }
+      } catch (error) {
+        console.error("Failed to delete book:", error);
+        alert("Failed to delete book");
+      }
+    }
+  };
+
+  const handleCancel = () => {
+    setEditingBook(null);
+    setFormdata({
+      title: "",
+      author: "",
+      quantity: "",
+      category: "",
+      image: null,
+    });
+    setImagePreview(null);
   };
 
   return (
@@ -105,7 +193,7 @@ const ManageBooks = () => {
         <img src="./images/image.png" alt="Library" />
       </div>
       <div className="add-books">
-        <h2>Add Books</h2>
+        <h2>{editingBook ? "Edit Book" : "Add Books"}</h2>
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
             <label htmlFor="title">
@@ -115,7 +203,7 @@ const ManageBooks = () => {
               type="text"
               name="title"
               id="title"
-              value={FormData.title}
+              value={formData.title}
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="Enter the title"
@@ -130,7 +218,7 @@ const ManageBooks = () => {
               type="text"
               name="author"
               id="author"
-              value={FormData.author}
+              value={formData.author}
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="Enter the author name"
@@ -145,7 +233,7 @@ const ManageBooks = () => {
               type="number"
               name="quantity"
               id="quantity"
-              value={FormData.quantity}
+              value={formData.quantity}
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="Enter the quantity"
@@ -161,7 +249,7 @@ const ManageBooks = () => {
             <select
               name="category"
               id="category"
-              value={FormData.category}
+              value={formData.category}
               onChange={handleChange}
               onBlur={handleBlur}
             >
@@ -178,9 +266,44 @@ const ManageBooks = () => {
               <span className="error">{errors.category}</span>
             )}
           </div>
-          <button type="submit" className="button">
-            ADD
-          </button>
+          <div className="form-group">
+            <label htmlFor="image">Upload Image</label>
+            <input
+              type="file"
+              name="image"
+              id="image"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  setFormdata((prev) => ({ ...prev, image: file }));
+                  const previewUrl = URL.createObjectURL(file);
+                  setImagePreview(previewUrl);
+                }
+              }}
+            />
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                style={{ width: "100px", height: "100px", marginTop: "10px" }}
+              />
+            )}
+          </div>
+          <div className="form-buttons">
+            <button type="submit" className="button">
+              {editingBook ? "UPDATE" : "ADD"}
+            </button>
+            {editingBook && (
+              <button
+                type="button"
+                className="button cancel-btn"
+                onClick={handleCancel}
+              >
+                CANCEL
+              </button>
+            )}
+          </div>
         </form>
       </div>
     </div>
