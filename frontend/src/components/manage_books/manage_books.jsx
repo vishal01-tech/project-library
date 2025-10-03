@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./manage_books.css";
+import NavbarSidebar from "../NavbarSidebar";
+import { Link } from "react-router-dom";
 
 const ManageBooks = () => {
   const [books, setBooks] = useState([]);
@@ -19,6 +21,18 @@ const ManageBooks = () => {
   useEffect(() => {
     fetchBooks();
   }, []);
+
+  const [userRole, setUserRole] = useState('user');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const role = localStorage.getItem('userRole') || 'user';
+    setUserRole(role);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+  };
 
   const fetchBooks = async () => {
     try {
@@ -188,123 +202,128 @@ const ManageBooks = () => {
   };
 
   return (
-    <div className="manage-container">
-      <div className="manage-img">
-        <img src="./images/image.png" alt="Library" />
-      </div>
-      <div className="add-books">
-        <h2>{editingBook ? "Edit Book" : "Add Books"}</h2>
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="form-group">
-            <label htmlFor="title">
-              Title <span>*</span>
-            </label>
-            <input
-              type="text"
-              name="title"
-              id="title"
-              value={formData.title}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Enter the title"
-            />
-            {errors.title && <span className="error">{errors.title}</span>}
+    <div className="home">
+      <NavbarSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userRole={userRole} handleLogout={handleLogout} />
+      <div className="main-content">
+        <div className="manage-container">
+          <div className="manage-img">
+            <img src="./images/image.png" alt="Library" />
           </div>
-          <div className="form-group">
-            <label htmlFor="author">
-              Author <span>*</span>
-            </label>
-            <input
-              type="text"
-              name="author"
-              id="author"
-              value={formData.author}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Enter the author name"
-            />
-            {errors.author && <span className="error">{errors.author}</span>}
+          <div className="add-books">
+            <h2>{editingBook ? "Edit Book" : "Add Books"}</h2>
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="form-group">
+                <label htmlFor="title">
+                  Title <span>*</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  id="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Enter the title"
+                />
+                {errors.title && <span className="error">{errors.title}</span>}
+              </div>
+              <div className="form-group">
+                <label htmlFor="author">
+                  Author <span>*</span>
+                </label>
+                <input
+                  type="text"
+                  name="author"
+                  id="author"
+                  value={formData.author}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Enter the author name"
+                />
+                {errors.author && <span className="error">{errors.author}</span>}
+              </div>
+              <div className="form-group">
+                <label htmlFor="quantity">
+                  Quantity <span>*</span>
+                </label>
+                <input
+                  type="number"
+                  name="quantity"
+                  id="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Enter the quantity"
+                />
+                {errors.quantity && (
+                  <span className="error">{errors.quantity}</span>
+                )}
+              </div>
+              <div className="form-group">
+                <label htmlFor="category">
+                  Category <span>*</span>
+                </label>
+                <select
+                  name="category"
+                  id="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                >
+                  <option value="">Select from here</option>
+                  <option value="history">History</option>
+                  <option value="biography">Biography</option>
+                  <option value="drama">Drama</option>
+                  <option value="poetry">Poetry</option>
+                  <option value="thriller">Thriller</option>
+                  <option value="mystery">Mystery</option>
+                  <option value="horror">Horror</option>
+                </select>
+                {errors.category && (
+                  <span className="error">{errors.category}</span>
+                )}
+              </div>
+              <div className="form-group">
+                <label htmlFor="image">Upload Image</label>
+                <input
+                  type="file"
+                  name="image"
+                  id="image"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setFormdata((prev) => ({ ...prev, image: file }));
+                      const previewUrl = URL.createObjectURL(file);
+                      setImagePreview(previewUrl);
+                    }
+                  }}
+                />
+                {imagePreview && (
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                  />
+                )}
+              </div>
+              <div className="form-buttons">
+                <button type="submit" className="button">
+                  {editingBook ? "UPDATE" : "ADD"}
+                </button>
+                {/* {editingBook && (
+                  <button
+                    type="button"
+                    className="button cancel-btn"
+                    onClick={handleCancel}
+                  >
+                    CANCEL
+                  </button>
+                )} */}
+              </div>
+            </form>
           </div>
-          <div className="form-group">
-            <label htmlFor="quantity">
-              Quantity <span>*</span>
-            </label>
-            <input
-              type="number"
-              name="quantity"
-              id="quantity"
-              value={formData.quantity}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Enter the quantity"
-            />
-            {errors.quantity && (
-              <span className="error">{errors.quantity}</span>
-            )}
-          </div>
-          <div className="form-group">
-            <label htmlFor="category">
-              Category <span>*</span>
-            </label>
-            <select
-              name="category"
-              id="category"
-              value={formData.category}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            >
-              <option value="">Select from here</option>
-              <option value="history">History</option>
-              <option value="biography">Biography</option>
-              <option value="drama">Drama</option>
-              <option value="poetry">Poetry</option>
-              <option value="thriller">Thriller</option>
-              <option value="mystery">Mystery</option>
-              <option value="horror">Horror</option>
-            </select>
-            {errors.category && (
-              <span className="error">{errors.category}</span>
-            )}
-          </div>
-          <div className="form-group">
-            <label htmlFor="image">Upload Image</label>
-            <input
-              type="file"
-              name="image"
-              id="image"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files[0];
-                if (file) {
-                  setFormdata((prev) => ({ ...prev, image: file }));
-                  const previewUrl = URL.createObjectURL(file);
-                  setImagePreview(previewUrl);
-                }
-              }}
-            />
-            {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="Preview"
-                style={{ width: "100px", height: "100px", marginTop: "10px" }}
-              />
-            )}
-          </div>
-          <div className="form-buttons">
-            <button type="submit" className="button">
-              {editingBook ? "UPDATE" : "ADD"}
-            </button>
-            {editingBook && (
-              <button
-                type="button"
-                className="button cancel-btn"
-                onClick={handleCancel}
-              >
-                CANCEL
-              </button>
-            )}
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./issue_books.css";
+import "../home/Home.css";
+import NavbarSidebar from "../NavbarSidebar";
 
 const IssueBooks = () => {
   const [members, setMembers] = useState([]);
@@ -10,6 +12,9 @@ const IssueBooks = () => {
   });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
+
+  const [userRole, setUserRole] = useState('user');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/members")
@@ -22,6 +27,15 @@ const IssueBooks = () => {
       .then((data) => setBooks(data))
       .catch((err) => console.error("Failed to fetch books", err));
   }, []);
+
+  useEffect(() => {
+    const role = localStorage.getItem('userRole') || 'user';
+    setUserRole(role);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -64,39 +78,44 @@ const IssueBooks = () => {
   };
 
   return (
-    <div className="issue-books">
-      <div className="issue-books-img">
-        <img src="./images/image.png" alt="image not found" />
-      </div>
-
-      <div className="issue-books-form">
-        <h2>Issue Book</h2>
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="form-group">
-            <label>Member <span>*</span></label>
-            <select name="member_id" value={formData.member_id} onChange={handleChange}>
-              <option value="">Select Member</option>
-              {members.map((member) => (
-                <option key={member.id} value={member.id}>{member.name}</option>
-              ))}
-            </select>
-            {errors.member_id && <span className="error">{errors.member_id}</span>}
+    <div className="home">
+      <NavbarSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userRole={userRole} handleLogout={handleLogout} />
+      <div className="main-content">
+        <div className="issue-books">
+          <div className="issue-books-img">
+            <img src="./images/image.png" alt="image not found" />
           </div>
 
-          <div className="form-group">
-            <label>Book <span>*</span></label>
-            <select name="book_id" value={formData.book_id} onChange={handleChange}>
-              <option value="">Select Book</option>
-              {books.map((book) => (
-                <option key={book.id} value={book.id}>{book.title}</option>
-              ))}
-            </select>
-            {errors.book_id && <span className="error">{errors.book_id}</span>}
-          </div>
+          <div className="issue-books-form">
+            <h2>Issue Book</h2>
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="form-group">
+                <label>Member <span>*</span></label>
+                <select name="member_id" value={formData.member_id} onChange={handleChange}>
+                  <option value="">Select Member</option>
+                  {members.map((member) => (
+                    <option key={member.id} value={member.id}>{member.name}</option>
+                  ))}
+                </select>
+                {errors.member_id && <span className="error">{errors.member_id}</span>}
+              </div>
 
-          <button type="submit" className="button">Issue Book</button>
-        </form>
-        {message && <p className="message">{message}</p>}
+              <div className="form-group">
+                <label>Book <span>*</span></label>
+                <select name="book_id" value={formData.book_id} onChange={handleChange}>
+                  <option value="">Select Book</option>
+                  {books.map((book) => (
+                    <option key={book.id} value={book.id}>{book.title}</option>
+                  ))}
+                </select>
+                {errors.book_id && <span className="error">{errors.book_id}</span>}
+              </div>
+
+              <button type="submit" className="button">Issue Book</button>
+            </form>
+            {message && <p className="message">{message}</p>}
+          </div>
+        </div>
       </div>
     </div>
   );

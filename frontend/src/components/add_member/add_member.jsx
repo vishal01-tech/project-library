@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./add_member.css";
+import "../home/Home.css";
+import NavbarSidebar from "../NavbarSidebar";
 
 const AddMember = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +14,17 @@ const AddMember = () => {
 
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState('user');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const role = localStorage.getItem('userRole') || 'user';
+    setUserRole(role);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+  };
 
   const validateField = (name, value) => {
     let message = "";
@@ -102,71 +115,76 @@ const AddMember = () => {
   };
 
   return (
-    <div className="add-member">
-      <div className="add-member-img">
-        <img src="./images/image.png" alt="image not found" />
-      </div>
-
-      <div className="add-member-form">
-        <h2>Add Member</h2>
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="form-group">
-            <label>
-              Fullname <span>*</span>
-            </label>
-            <input
-              id="name"
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Enter your fullname"
-            />
-            {errors.name && <span className="error">{errors.name}</span>}
+    <div className="home">
+      <NavbarSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userRole={userRole} handleLogout={handleLogout} />
+      <div className="main-content">
+        <div className="add-member">
+          <div className="add-member-img">
+            <img src="./images/image.png" alt="image not found" />
           </div>
 
-          <div className="form-group">
-            <label>
-              Phone <span>*</span>
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Enter your phone number"
-            />
-            {errors.phone && <span className="error">{errors.phone}</span>}
-          </div>
+          <div className="add-member-form">
+            <h2>Add Member</h2>
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="form-group">
+                <label>
+                  Fullname <span>*</span>
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Enter your fullname"
+                />
+                {errors.name && <span className="error">{errors.name}</span>}
+              </div>
 
-          <div className="form-group">
-            <label>
-              Email <span>*</span>
-            </label>
-            <input
-              id="email"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Enter your email"
-            />
-            {errors.email && <span className="error">{errors.email}</span>}
-          </div>
-          <div className="form-group">
-            <label htmlFor="address">Address <span>*</span></label>
-            <input type="address" id="address" name="address" value={formData.address} onChange={handleChange} onBlur={handleBlur} placeholder="Enter your address" />
-            {errors.address && <span className="error">{ errors.address}</span>}
-          </div>
+              <div className="form-group">
+                <label>
+                  Phone <span>*</span>
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Enter your phone number"
+                />
+                {errors.phone && <span className="error">{errors.phone}</span>}
+              </div>
 
-          <button type="submit" className="button">
-            Add Member
-          </button>
-        </form>
+              <div className="form-group">
+                <label>
+                  Email <span>*</span>
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Enter your email"
+                />
+                {errors.email && <span className="error">{errors.email}</span>}
+              </div>
+              <div className="form-group">
+                <label htmlFor="address">Address <span>*</span></label>
+                <input type="address" id="address" name="address" value={formData.address} onChange={handleChange} onBlur={handleBlur} placeholder="Enter your address" />
+                {errors.address && <span className="error">{ errors.address}</span>}
+              </div>
+
+              <button type="submit" className="button">
+                Add Member
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   );

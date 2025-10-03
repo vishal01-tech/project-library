@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import './Home.css'
 import { Link } from "react-router-dom";
+import NavbarSidebar from "../NavbarSidebar";
 
 const Home = () => {
   const [books, setBooks] = useState([]);
@@ -55,43 +56,11 @@ const Home = () => {
 
   return (
     <div className="home">
-      {/* Navbar */}
-      <nav className="navbar">
-        <div className="navbar-left">
-          <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            ☰
-          </button>
-          <h1>The Chapter House</h1>
-        </div>
-        <div className="navbar-right">
-          <Link to="/" onClick={handleLogout}>
-            <button className="log-out">Log Out</button>
-          </Link>
-        </div>
-      </nav>
-
-      {/* Sidebar */}
-      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-content">
-          <Link to="/addmember" className="sidebar-link">
-            <span></span> Add Member
-          </Link>
-          <Link to="/managebooks" className="sidebar-link">
-            <span></span> Manage Books
-          </Link>
-          <Link to="/issuebooks" className="sidebar-link">
-            <span></span> Issue Books
-          </Link>
-          {userRole === 'super_admin' && (
-            <Link to="/signup" className="sidebar-link">
-              <span></span> Add User
-            </Link>
-          )}
-        </div>
-      </div>
+      <NavbarSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userRole={userRole} handleLogout={handleLogout} />
 
       {/* Main Content */}
       <div className="main-content">
+        <h2>All Books</h2>
         <div className="books-grid">
           {books.map((book) => (
             <div key={book.id} className="book-card">

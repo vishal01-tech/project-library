@@ -61,7 +61,7 @@ def login(user_login: UserLogin, db: Session = Depends(get_db)):
     return {"access_token": access_token,"token_type": "bearer","email": user.email,"username": user.username,"role": user.role}
 
 
-# Signup API - Only super_admin can create users, except for the first user which can be super_admin
+# Signup API - for admin
 @app.post("/signup")
 def signup(user: UserCreate, request: Request, db: Session = Depends(get_db)):
     # Check if user already exists

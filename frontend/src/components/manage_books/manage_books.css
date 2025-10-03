@@ -16,15 +16,18 @@ body {
     align-items: center;
     padding: 20px;
     min-height: 100vh;
+    min-width: 100%;
 }
 
 .manage-img {
     margin-bottom: 20px;
+    margin-left: 900px;
+    margin-top: 300px;
 }
 
 .manage-img img {
     height: 200px;
-    width: auto;
+    /* width: auto; */
     border-radius: 10px;
 }
 
