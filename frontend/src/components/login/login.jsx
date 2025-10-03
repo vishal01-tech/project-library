@@ -86,7 +86,7 @@ const Login = () => {
       // Store token for future authenticated requests
       localStorage.setItem("access_token", data.access_token);
 
-      // Redirect to home page after successful login
+      // Redirect to home page after login
       navigate("/home");
     } catch (error) {
     }

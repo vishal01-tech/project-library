@@ -24,15 +24,24 @@ body {
     margin-top: 180px;
   }
 }
+
 .nav {
   height: 40px;
   width: 100%;
+  
 }
 
 .nav h3 {
   color: black;
   font-size: 1.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in;
 }
+
+.nav h3:hover{
+  color: red;
+}
+
 .nav .sign-up {
   margin-left: 700px;
   margin-top: -50px;
@@ -93,7 +102,15 @@ h2 {
   text-align: center;
   margin-top: 10px;
   margin-left: 40px;
+  cursor: pointer;
+  transition: all 0.5s ease-in-out;
 }
+
+.forgot-button:hover{
+  color: red;
+}
+
+
 .error-message{
   display: block;
   position: absolute;
