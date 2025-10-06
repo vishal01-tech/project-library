@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./manage_books.css";
 import NavbarSidebar from "../NavbarSidebar";
 import { Link } from "react-router-dom";
@@ -17,6 +17,7 @@ const ManageBooks = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const { id } = useParams();
 
   useEffect(() => {
     fetchBooks();
@@ -30,6 +31,12 @@ const ManageBooks = () => {
     setUserRole(role);
   }, []);
 
+  useEffect(() => {
+    if (id) {
+      fetchBookDetails(id);
+    }
+  }, [id]);
+
   const handleLogout = () => {
     localStorage.removeItem('userRole');
   };
@@ -41,6 +48,34 @@ const ManageBooks = () => {
       setBooks(data);
     } catch (error) {
       console.error("Failed to fetch books:", error);
+    }
+  };
+
+  const fetchBookDetails = async (bookId) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/books/${bookId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setEditingBook(data);
+        setFormdata({
+          title: data.title,
+          author: data.author,
+          quantity: data.quantity.toString(),
+          category: data.category,
+          image: null,
+        });
+        if (data.image) {
+          setImagePreview(
+            data.image.startsWith("/uploads")
+              ? `http://127.0.0.1:8000${data.image}`
+              : data.image
+          );
+        }
+      } else {
+        console.error("Failed to fetch book details");
+      }
+    } catch (error) {
+      console.error("Failed to fetch book details:", error);
     }
   };
 
@@ -206,11 +241,11 @@ const ManageBooks = () => {
       <NavbarSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} userRole={userRole} handleLogout={handleLogout} />
       <div className="main-content">
         <div className="manage-container">
-          <div className="manage-img">
+          {/* <div className="manage-img">
             <img src="./images/image.png" alt="Library" />
-          </div>
+          </div> */}
           <div className="add-books">
-            <h2>{editingBook ? "Edit Book" : "Add Books"}</h2>
+            <h3>Add Books</h3>
             <form onSubmit={handleSubmit} noValidate>
               <div className="form-group">
                 <label htmlFor="title">
@@ -322,6 +357,45 @@ const ManageBooks = () => {
                 )} */}
               </div>
             </form>
+          </div>
+        </div>
+        <div className="books-list">
+          <h2>Books</h2>
+          <div className="books-table">
+            {books.map((book) => (
+              <div key={book.id} className="book-row">
+                <div className="book-details">
+                  <img
+                    src={`http://127.0.0.1:8000${book.image}`}
+                    alt={book.title}
+                    className="book-thumb"
+                    onError={(e) => {
+                      e.target.src = '/images/image.png';
+                    }}
+                  />
+                  <div className="book-text">
+                    <h3>{book.title}</h3>
+                    <p>by {book.author}</p>
+                    <p>Category: {book.category}</p>
+                    <p>Quantity: {book.quantity}</p>
+                  </div>
+                </div>
+                <div className="book-actions">
+                  <button
+                    className="edit-btn"
+                    onClick={() => handleEdit(book)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(book.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

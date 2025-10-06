@@ -5,12 +5,16 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 import os
 import shutil
+import random
+import string
+from datetime import datetime, timedelta
+from app.utils.email import send_otp_email
 
 # Ensure uploads directory exists
 os.makedirs("app/uploads", exist_ok=True)
 from app.database import SessionLocal
 from .models import Users , Members , Books, Borrowed
-from app.schemas import UserLogin, TokenResponse , UserCreate  , MemberCreate , BookCreate, BookUpdate, BorrowedCreate
+from app.schemas import UserLogin, TokenResponse , UserCreate  , MemberCreate , BookCreate, BookUpdate, BorrowedCreate, ForgotPasswordRequest, ResetPasswordRequest
 from app.utils.auth import create_access_token, get_current_user_with_role, verify_access_token
 from datetime import timedelta
 
@@ -311,3 +315,57 @@ def get_borrowed_books(db: Session = Depends(get_db)):
 def users_exist(db: Session = Depends(get_db)):
     user_count = db.query(Users).count()
     return {"exists": user_count > 0}
+
+
+# POST forgot password
+@app.post("/forgot-password")
+def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    email = request.email
+    user = db.query(Users).filter(Users.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Generate OTP
+    otp = ''.join(random.choices(string.digits, k=6))
+    otp_expiry = datetime.utcnow() + timedelta(minutes=10)
+
+    # Save OTP to user
+    user.otp = otp
+    user.otp_expiry = otp_expiry
+    db.commit()
+
+    # Send email
+    try:
+        email_sent = send_otp_email(email, otp)
+    except Exception as e:
+        email_sent = False
+        print(f"Email send error: {e}")
+
+    if email_sent:
+        return {"message": "OTP sent to your email"}
+    else:
+        # For testing, return OTP even if email fails
+        return {"message": "OTP generated (email failed, check logs)", "otp": otp}
+
+
+# POST reset password
+@app.post("/reset-password")
+def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+    email = request.email
+    otp = request.otp
+    new_password = request.new_password
+    user = db.query(Users).filter(Users.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user.otp != otp or user.otp_expiry < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+
+    # Hash new password
+    hashed_password = pwd_context.hash(new_password)
+    user.password = hashed_password
+    user.otp = None
+    user.otp_expiry = None
+    db.commit()
+
+    return {"message": "Password reset successfully"}

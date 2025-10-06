@@ -1,8 +1,7 @@
 import datetime
-import jwt
 import os
 from dotenv import load_dotenv
-from jose import JWTError
+from jose import jwt, JWTError
 from fastapi import Request, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
@@ -18,11 +17,11 @@ ACCESS_TOKEN_TIME = int(os.getenv("ACCESS_TOKEN_TIME"))
 
 
 # to create the jwt access token
-def create_access_token(data : dict,time_delta : None):
+def create_access_token(data : dict, time_delta : None):
     to_encode = data.copy()
     expire = datetime.datetime.now() + time_delta
-    to_encode.update({"exp":expire})
-    encoded_jwt = jwt.encode(to_encode,SECRET_KEY,algorithm = ALGORITHM)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     return encoded_jwt
 

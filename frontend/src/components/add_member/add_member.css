@@ -16,14 +16,14 @@ body {
 .add-member-img {
     width: 100px;
     height: 20vh;
-    margin-left: 300px;
+    margin-left: 550px;
 }
 
 .add-member-img img {
     height: 500px;
     width: 400px;
     margin-top: 150px;
-    margin-left: 300px;
+    margin-left: 550px;
 }
 
 .add-member-form {
@@ -35,7 +35,7 @@ body {
     justify-content: center;
     margin-bottom: 100px;
     height: 400px;
-    margin-right: 700px;
+    margin-right: 450px;
 }
 
 h2 {

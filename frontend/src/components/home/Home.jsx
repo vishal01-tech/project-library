@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import './Home.css'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import NavbarSidebar from "../NavbarSidebar";
 
 const Home = () => {
   const [books, setBooks] = useState([]);
   const [userRole, setUserRole] = useState('user');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Get user role from localStorage or cookie
@@ -81,10 +82,10 @@ const Home = () => {
               </div>
               <div className="book-actions">
                 <button
-                  className="action-btn add-btn"
-                  onClick={() => handleAddBook(book.id)}
+                  className="action-btn update-btn"
+                  onClick={() => navigate(`/manage-books/${book.id}`)}
                 >
-                  Add
+                  Update
                 </button>
                 <button
                   className="action-btn delete-btn"

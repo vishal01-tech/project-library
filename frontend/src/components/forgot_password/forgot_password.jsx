@@ -11,19 +11,40 @@ function Forgotpassword() {
     /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
   // Handle form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateEmail(forgotEmail)) {
       setErrors("Please enter a email address.");
     } else {
       setErrors(""); // Clear errors if email is valid
-      // Logic to send OTP goes here
-      console.log("Sending OTP to:", forgotEmail);
+      try {
+        const response = await fetch("http://localhost:8000/forgot-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: forgotEmail }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          alert(data.message);
+          if (data.otp) {
+            alert(`Your OTP is: ${data.otp}`);
+          }
+        } else {
+          setErrors(data.detail || "Failed to send OTP");
+        }
+      } catch (error) {
+        setErrors("Failed to send OTP");
+      }
     }
   };
 
   return (
     <>
+        <nav className="nav">
+              <h3>LibraryApp</h3>
+        </nav>
       <div className="forgot-img">
         <img src="./images/image.png" alt="image not found" />
       </div>
