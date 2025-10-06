@@ -3,6 +3,7 @@
   padding: 0;
   box-sizing: border-box;
   
+  
 }
 
 body {
@@ -11,7 +12,8 @@ body {
   justify-content: center;
   align-items: center;
   margin: 0;
-  background-color: #f0f0e6;
+
+  background-color: #f9f9f9;
 
 }
 .img {

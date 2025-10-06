@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./home/Home.css";
 
-const NavbarSidebar = ({
-  userRole,
-  handleLogout,
-}) => {
+function NavbarSidebar({
+  userRole, handleLogout,
+}) {
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("email");
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+  }, []);
+
   return (
     <>
       {/* Navbar */}
@@ -34,7 +42,13 @@ const NavbarSidebar = ({
           <Link to="/issuebooks" className="sidebar-link">
             <span></span> Issue Books
           </Link>
-          {userRole === "super_admin" && (
+          <Link to="/returnbooks" className="sidebar-link">
+            <span></span> Return Books
+          </Link>
+          <Link to="/memberlist" className="sidebar-link">
+            <span></span> Member List
+          </Link>
+          {(userRole === "super_admin" || email === "admin@gmail.com") && (
             <Link to="/signup" className="sidebar-link">
               <span></span> Add User
             </Link>
@@ -43,6 +57,6 @@ const NavbarSidebar = ({
       </div>
     </>
   );
-};
+}
 
 export default NavbarSidebar;

@@ -85,6 +85,8 @@ const Login = () => {
 
       // Store token for future authenticated requests
       localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("userRole", data.role);
+      localStorage.setItem("email", data.email);
 
       // Redirect to home page after login
       navigate("/home");
@@ -96,15 +98,15 @@ const Login = () => {
     <>
       <nav className="nav">
         <h3>LibraryApp</h3>
-        <div className="sign-up">
-          <p>
+        {/* <div className="sign-up"> */}
+          {/* <p>
             Don't have an account? <Link to="/signup">Sign Up</Link>
-          </p>
-        </div>
+          </p> */}
+        {/* </div> */}
       </nav>
 
       <div className="img">
-        <img src="./images/image.png" alt="Library" />
+        <img src="./images/image.png" alt="Library" loading="lazy" />
       </div>
 
       <div className="login-container">

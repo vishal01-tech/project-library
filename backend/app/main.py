@@ -14,7 +14,7 @@ from app.utils.email import send_otp_email
 os.makedirs("app/uploads", exist_ok=True)
 from app.database import SessionLocal
 from .models import Users , Members , Books, Borrowed
-from app.schemas import UserLogin, TokenResponse , UserCreate  , MemberCreate , BookCreate, BookUpdate, BorrowedCreate, ForgotPasswordRequest, ResetPasswordRequest
+from app.schemas import UserLogin, TokenResponse , UserCreate  , MemberCreate , BookCreate, BookUpdate, BorrowedCreate, ReturnBook, ForgotPasswordRequest, ResetPasswordRequest
 from app.utils.auth import create_access_token, get_current_user_with_role, verify_access_token
 from datetime import timedelta
 
@@ -286,7 +286,8 @@ def delete_book(book_id: int, db: Session = Depends(get_db)):
 
 # POST return book
 @app.post("/returnbook")
-def return_book(borrowed_id: int, db: Session = Depends(get_db)):
+def return_book(return_data: ReturnBook, db: Session = Depends(get_db)):
+    borrowed_id = return_data.borrowed_id
     borrowed = db.query(Borrowed).filter(Borrowed.id == borrowed_id, Borrowed.returned_at.is_(None)).first()
     if not borrowed:
         raise HTTPException(status_code=404, detail="Borrowed record not found or already returned")
@@ -369,3 +370,11 @@ def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db))
     db.commit()
 
     return {"message": "Password reset successfully"}
+
+
+
+
+
+
+
+

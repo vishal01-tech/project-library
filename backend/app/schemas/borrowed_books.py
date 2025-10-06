@@ -16,3 +16,6 @@ class Borrowed(BorrowedBase):
 
     class Config:
         orm_mode = True
+
+class ReturnBook(BaseModel):
+    borrowed_id: int

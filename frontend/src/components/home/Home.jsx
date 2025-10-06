@@ -51,7 +51,9 @@ const Home = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('userRole');
+    // sessionStorage.removeItem('userRole');
+    localStorage.removeItem('access_token');
+    // sessionStorage.removeItem('email');
     // Clear any other auth data
   };
 
