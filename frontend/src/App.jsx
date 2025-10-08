@@ -1,31 +1,112 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./components/login/login";
-import SignUp from "./components/sign_up/signup";
-import Forgotpassword from "./components/forgot_password/forgot_password";
-import ResetPassword from "./components/reset_password/reset_password";
-import Home from "./components/home/Home";
-import AddMember from "./components/add_member/add_member";
-import ManageBooks from "./components/manage_books/manage_books";
-import IssueBooks from "./components/issue_books/issue_books";
-import ReturnBooks from "./components/return_books/return_books";
-import NotFound from "./components/NotFound";
-import MemberList from "./components/MemberList";
+import Login from "./pages/login";
+import SignUp from "./pages/signup";
+import Forgotpassword from "./pages/forgot_password";
+import ResetPassword from "./pages/reset_password";
+import Home from "./pages/Home";
+import AddMember from "./pages/add_member";
+import ManageBooks from "./pages/manage_books";
+import IssueBooks from "./pages/issue_books";
+import ReturnBooks from "./pages/return_books";
+import NotFound from "./pages/NotFound"
+import MemberList from "./pages/MemberList"
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/forgotpassword" element={<Forgotpassword />} />
-        <Route path="/resetpassword" element={<ResetPassword />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/addmember" element={<AddMember />} />
-        <Route path="/managebooks" element={<ManageBooks />} />
-        <Route path="/manage-books/:id" element={<ManageBooks />} />
-        <Route path="/issuebooks" element={<IssueBooks />} />
-        <Route path="/returnbooks" element={<ReturnBooks />} />
-        <Route path="/memberlist" element={<MemberList />} />
+        {/* Public routes - redirect to home if logged in */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute isAuthRequired={false}>
+              <Login />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/forgotpassword"
+          element={
+            <ProtectedRoute isAuthRequired={false}>
+              <Forgotpassword />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/resetpassword"
+          element={
+            <ProtectedRoute isAuthRequired={false}>
+              <ResetPassword />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected routes - require login */}
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/addmember"
+          element={
+            <ProtectedRoute>
+              <AddMember />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/managebooks"
+          element={
+            <ProtectedRoute>
+              <ManageBooks />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage-books/:id"
+          element={
+            <ProtectedRoute>
+              <ManageBooks />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/issuebooks"
+          element={
+            <ProtectedRoute>
+              <IssueBooks />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/returnbooks"
+          element={
+            <ProtectedRoute>
+              <ReturnBooks />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/memberlist"
+          element={
+            <ProtectedRoute>
+              <MemberList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <ProtectedRoute>
+              <SignUp />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

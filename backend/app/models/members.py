@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String , TIMESTAMP
-from app.database import Base
+from backend.app.database.database import Base
 from sqlalchemy.sql import func  
 
 class Members(Base):

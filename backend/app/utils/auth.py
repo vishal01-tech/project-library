@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from jose import jwt, JWTError
 from fastapi import Request, HTTPException, Depends
 from sqlalchemy.orm import Session
-from app.database import SessionLocal
+from backend.app.database.database import SessionLocal
 from app.models import Users
 
 
@@ -37,7 +37,13 @@ def verify_access_token(access_token: str):
 
 # to get the current user
 def get_current_user(request: Request):
+    # Try cookie first
     token = request.cookies.get("access_token")
+    if not token:
+        # Try Authorization header
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
     if not token:
         return None
     return verify_access_token(token)
@@ -56,7 +62,13 @@ def get_current_user_from_token(token: str = Depends(lambda: None)):
 # Dependency to get current user with role check
 def get_current_user_with_role(required_role: str = None):
     def dependency(request: Request, db: Session = Depends(lambda: SessionLocal())):
+        # Try cookie first
         token = request.cookies.get("access_token")
+        if not token:
+            # Try Authorization header
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                token = auth_header.split(" ")[1]
         if not token:
             raise HTTPException(status_code=401, detail="Not authenticated")
 

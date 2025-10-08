@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from app.database import Base
+from backend.app.database.database import Base
 
 class Books(Base):
     __tablename__ = "books"
@@ -9,4 +9,4 @@ class Books(Base):
     author = Column(String(50), nullable=False)
     quantity = Column(Integer,nullable=False)
     category = Column(String(50),nullable=False)
-    image = Column(String(255), nullable=True)  # URL or path to book image
+    image = Column(String(255), nullable=True) 

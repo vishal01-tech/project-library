@@ -1,0 +1,123 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  background-color: #f5f5eb !important;
+}
+
+
+span{
+  color: red !important;
+}
+.img {
+  width: 100px;
+  height: 20vh;
+  margin-left: 600px;
+  img {
+    height: 400px;
+    width: 400px;
+    margin-top: 180px;
+  }
+}
+
+.nav {
+  height: 40px;
+  width: 100%;
+}
+
+.nav h3 {
+  color: black;
+  font-size: 1.8rem;
+  margin-right: 900px;
+  cursor: pointer;
+  transition: all 0.3s ease-in;
+}
+
+.nav h3:hover {
+  color: red;
+}
+
+.nav .sign-up {
+  margin-left: 700px;
+  margin-top: -50px;
+  color: #0d0d0d;
+}
+
+.login-container {
+  width: 350px;
+  padding: 30px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 100px;
+  height: 400px;
+}
+
+h2 {
+  text-align: center;
+  color: #333333;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  margin-bottom: 50px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 20px;
+  margin-bottom: 5px;
+  color: #0d0d0d;
+}
+
+.input-group input {
+  width: 120%;
+  padding: 10px;
+  font-size: 15px;
+  border: 2px solid #f0f0e6;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  color: #333333;
+}
+
+.input-group input::placeholder {
+  color: #888888;
+}
+
+.btn button {
+  width: 120%;
+  padding: 10px;
+  font-size: 15px;
+}
+
+.forgot-button {
+  color: black;
+  text-align: center;
+  margin-top: 10px;
+  margin-left: 40px;
+  cursor: pointer;
+  transition: all 0.5s ease-in-out;
+}
+
+.forgot-button:hover {
+  color: red;
+}
+
+.error-message {
+  display: block;
+  position: absolute;
+  font-size: 1rem;
+  margin-right: 170px;
+}

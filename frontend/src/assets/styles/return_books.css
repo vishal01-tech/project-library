@@ -1,0 +1,60 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0e6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.return-books-list {
+    width: 600px;
+    padding: 30px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 100px;
+    height: auto;
+    margin-right: 200px;
+}
+
+.borrowed-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.borrowed-item div {
+    flex: 4;
+}
+
+.button {
+    background-color: #333333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.message {
+    color: green;
+    margin-top: 10px;
+    text-align: center;
+}
+
+ul {
+    list-style: none;
+}

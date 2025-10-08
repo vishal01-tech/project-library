@@ -1,11 +1,11 @@
-version: '3.9'
-
 services:
   backend:
     build:
       context: ./backend/app
       dockerfile: Dockerfile
     container_name: backend
+    # image_name: backend-image
+
     ports:
       - "8000:8000"
     networks:
@@ -16,6 +16,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend
+    # image_name : frontend-image
     ports:
       - "3000:3000"
     depends_on:

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "./home/Home.css";
+import "../assets/styles/Home.css";
+
+
 
 function NavbarSidebar({
   userRole, handleLogout,
@@ -31,26 +33,26 @@ function NavbarSidebar({
       <div className="sidebar open">
         <div className="sidebar-content">
           <Link to="/home" className="sidebar-link">
-            <span></span> Home
+            Home
           </Link>
           <Link to="/addmember" className="sidebar-link">
-            <span></span> Add Member
+             Add Member
           </Link>
           <Link to="/managebooks" className="sidebar-link">
-            <span></span> Manage Books
+             Manage Books
           </Link>
           <Link to="/issuebooks" className="sidebar-link">
-            <span></span> Issue Books
+           Issue Books
           </Link>
           <Link to="/returnbooks" className="sidebar-link">
-            <span></span> Return Books
+            Return Books
           </Link>
           <Link to="/memberlist" className="sidebar-link">
-            <span></span> Member List
+            Member List
           </Link>
           {(userRole === "super_admin" || email === "admin@gmail.com") && (
             <Link to="/signup" className="sidebar-link">
-              <span></span> Add User
+               Add User
             </Link>
           )}
         </div>

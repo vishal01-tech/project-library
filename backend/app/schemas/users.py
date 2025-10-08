@@ -18,7 +18,7 @@ class UserCreate(BaseModel):
     username: str
     email: EmailStr
     password: str
-    role: str = "user"  # Default role
+    role: str = "user" 
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
