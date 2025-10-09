@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Login from "./pages/login";
 import SignUp from "./pages/signup";
 import Forgotpassword from "./pages/forgot_password";
@@ -15,6 +17,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <Router>
+      <ToastContainer />
       <Routes>
         {/* Public routes - redirect to home if logged in */}
         <Route

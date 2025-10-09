@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import api from "../api/api";
 import "../assets/styles/manage_books.css";
-
 import NavbarSidebar from "../components/NavbarSidebar";
 
 
 const ManageBooks = () => {
+  const baseURL = api.defaults.baseURL;
   const [books, setBooks] = useState([]);
   const [editingBook, setEditingBook] = useState(null);
   const [formData, setFormdata] = useState({
@@ -41,6 +42,9 @@ const ManageBooks = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("userRole");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("email");
+    toast.success("Logged out successfully!");
   };
 
   const fetchBooks = async () => {
@@ -69,7 +73,7 @@ const ManageBooks = () => {
         if (data.image) {
           setImagePreview(
             data.image.startsWith("/media")
-              ? `api${data.image}`
+              ? `${baseURL}${data.image}`
               : data.image
           );
         }
@@ -141,11 +145,6 @@ const ManageBooks = () => {
     if (!validateForm()) return;
 
     try {
-      const url = editingBook
-        ? `api/${editingBook.id}`
-        : "api/addbooks";
-      const method = editingBook ? "PUT" : "POST";
-
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
       formDataToSend.append("author", formData.author);
@@ -155,16 +154,16 @@ const ManageBooks = () => {
         formDataToSend.append("image", formData.image);
       }
 
-      const response = await fetch(url, {
-        method: method,
-        body: formDataToSend,
-      });
+      let response;
+      if (editingBook) {
+        response = await api.put(`/books/${editingBook.id}`, formDataToSend);
+      } else {
+        response = await api.post("/addbooks", formDataToSend);
+      }
 
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(
-          editingBook ? "Book updated successfully" : "Book added successfully"
+      if (response.status === 200 || response.status === 201) {
+        toast.success(
+          editingBook ? "Book updated successfully!" : "Book added successfully!"
         );
         setFormdata({
           title: "",
@@ -177,12 +176,12 @@ const ManageBooks = () => {
         setEditingBook(null);
         fetchBooks();
       } else {
-        console.error("Error response:", result);
-        alert(result.detail || "Failed to save book");
+        console.error("Error response:", response.data);
+        toast.error(response.data.detail || "Failed to save book");
       }
     } catch (err) {
       console.error("Error during fetch:", err);
-      alert("Please try again");
+      toast.error("Please try again");
     }
   };
 
@@ -199,7 +198,7 @@ const ManageBooks = () => {
     if (book.image) {
       setImagePreview(
         book.image.startsWith("/media")
-          ? `api${book.image}`
+          ? `${baseURL}${book.image}`
           : book.image
       );
     } else {
@@ -212,14 +211,14 @@ const ManageBooks = () => {
       try {
         const response = await api.delete(`/books/${bookId}`);
         if (response.status === 200) {
-          alert("Book deleted successfully");
+          toast.success("Book deleted successfully!");
           fetchBooks();
         } else {
-          alert("Failed to delete book");
+          toast.error("Failed to delete book");
         }
       } catch (error) {
         console.error("Failed to delete book:", error);
-        alert("Failed to delete book");
+        toast.error("Failed to delete book");
       }
     }
   };
@@ -377,7 +376,7 @@ const ManageBooks = () => {
               <div key={book.id} className="book-row">
                 <div className="book-details">
                   <img
-                    src={`http://127.0.0.1:8000${book.image}`}
+                    src={`${baseURL}${book.image}`}
                     alt={book.title}
                     className="book-thumb"
                     onError={(e) => {

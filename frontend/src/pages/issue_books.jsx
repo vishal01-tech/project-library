@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import "../assets/styles/issue_books.css";
 
 // import "../home/Home.css";
@@ -13,20 +14,17 @@ const IssueBooks = () => {
     book_id: ""
   });
   const [errors, setErrors] = useState({});
-  const [message, setMessage] = useState("");
 
   const [userRole, setUserRole] = useState('user');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/members")
-      .then((res) => res.json())
-      .then((data) => setMembers(data))
+    api.get("/members")
+      .then((response) => setMembers(response.data))
       .catch((err) => console.error("Failed to fetch members", err));
 
-    fetch("http://127.0.0.1:8000/books")
-      .then((res) => res.json())
-      .then((data) => setBooks(data.data))
+    api.get("/books")
+      .then((response) => setBooks(response.data.data))
       .catch((err) => console.error("Failed to fetch books", err));
   }, []);
 
@@ -37,6 +35,9 @@ const IssueBooks = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('userRole');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('email');
+    toast.success("Logged out successfully!");
   };
 
   const validateForm = () => {
@@ -50,7 +51,6 @@ const IssueBooks = () => {
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value});
     setErrors({...errors, [e.target.name]: ""});
-    setMessage("");
   };
 
   const handleSubmit = async (e) => {
@@ -64,13 +64,13 @@ const IssueBooks = () => {
       });
       const result = response.data;
       if (response.status === 200) {
-        setMessage("Book issued successfully!");
+        toast.success("Book issued successfully!");
         setFormData({member_id: "", book_id: ""});
       } else {
-        setMessage(result.detail || "Failed to issue book.");
+        toast.error(result.detail || "Failed to issue book.");
       }
     } catch (error) {
-      setMessage("Network error. Please try again.");
+      toast.error("Network error. Please try again.");
       console.error(error);
     }
   };
@@ -107,7 +107,6 @@ const IssueBooks = () => {
 
               <button type="submit" className="button">Issue Book</button>
             </form>
-            {message && <p className="message">{message}</p>}
           </div>
         </div>
       </div>

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import "../assets/styles/Home.css";
-
-import { Link, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import NavbarSidebar from "../components/NavbarSidebar";
 import api from "../api/api"; 
 

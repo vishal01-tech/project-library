@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from backend.app.database.database import get_db
+from app.database.database import get_db
 from app.schemas.borrowed_books import BorrowedCreate, ReturnBook
 from app.crud.borrowed_books import issue_book, return_book, get_borrowed_books
 from app.utils.auth import get_current_user_with_role
+from app.responses import success_response
+
 
 router = APIRouter()
 
@@ -11,7 +13,7 @@ router = APIRouter()
 @router.post("/issuebook")
 def issue_book_route(borrowed: BorrowedCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
     new_borrowed = issue_book(db, borrowed)
-    return {"message": "Book issued successfully"}
+    return success_response({"message": "Book issued successfully"})
 
 # POST return book
 @router.post("/returnbook")

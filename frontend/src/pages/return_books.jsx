@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import "../assets/styles/return_books.css";
 
 import api from "../api/api";
@@ -8,7 +9,6 @@ const ReturnBooks = () => {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [members, setMembers] = useState([]);
   const [books, setBooks] = useState([]);
-  const [message, setMessage] = useState("");
 
   const [userRole, setUserRole] = useState("user");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -43,6 +43,9 @@ const ReturnBooks = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("userRole");
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('email');
+    toast.success("Logged out successfully!");
   };
 
   const getMemberName = (memberId) => {
@@ -62,7 +65,7 @@ const ReturnBooks = () => {
       });
       const result = response.data;
       if (response.status === 200) {
-        setMessage("Book returned successfully!");
+        toast.success("Book returned successfully!");
         // Remove the returned book
         setBorrowedBooks(borrowedBooks.filter((b) => b.id !== borrowedId));
       } else {
@@ -74,10 +77,10 @@ const ReturnBooks = () => {
             errorMessage = result.detail;
           }
         }
-        setMessage(errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error) {
-      setMessage("Error Please try again.");
+      toast.error("Error Please try again.");
       console.error(error);
     }
   };
@@ -114,7 +117,6 @@ const ReturnBooks = () => {
                   ))}
                 </ul>
               )}
-              {message && <p className="message">{message}</p>}
             </div>
           </div>
         </div>

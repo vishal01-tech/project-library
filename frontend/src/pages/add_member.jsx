@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "../assets/styles/add_member.css";
 import api from "../api/api";
 import NavbarSidebar from "../components/NavbarSidebar";
@@ -23,7 +24,10 @@ const AddMember = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('userRole');
+    // localStorage.removeItem('userRole');
+    localStorage.removeItem('access_token');
+    // localStorage.removeItem('email');
+    toast.success("Logged out successfully!");
   };
 
   const validateField = (name, value) => {
@@ -87,17 +91,10 @@ const AddMember = () => {
     if (!validateForm()) return;
 
     try {
-      const response = await api.post("/addmember", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      const result = await response.json();
+      const response = await api.post("/addmember", formData);
 
-      if (response.ok) {
-        alert("Added member successfully!");
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Member added successfully!");
         setFormData({
           name: "",
           phone: "",
@@ -106,10 +103,10 @@ const AddMember = () => {
         });
         navigate("/home"); // Redirect to home page
       } else {
-        alert(result.detail || "Add member failed.");
+        toast.error(response.data.detail || "Add member failed.");
       }
     } catch (err) {
-      alert("Network error. Please try again.");
+      toast.error("Network error. Please try again.");
       console.error(err);
     }
   };

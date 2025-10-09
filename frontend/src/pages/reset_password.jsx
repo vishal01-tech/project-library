@@ -26,18 +26,11 @@ function ResetPassword() {
     } else {
       setErrors(""); // Clear errors if password is valid
       try {
-        const response = await fetch("http://localhost:8000/reset-password", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, otp, new_password: password }),
-        });
-        const data = await response.json();
-        if (response.ok) {
-          alert(data.message);
+        const response = await api.post("/reset-password", { email, otp, new_password: password });
+        if (response.status === 200 || response.status === 201) {
+          alert(response.data.message);
         } else {
-          setErrors(data.detail || "Failed to reset password");
+          setErrors(response.data.detail || "Failed to reset password");
         }
       } catch (error) {
         setErrors("Failed to reset password");

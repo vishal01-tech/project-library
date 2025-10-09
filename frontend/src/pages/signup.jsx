@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "../assets/styles/signup.css";
 import api from "../api/api";
 import NavbarSidebar from "../components/NavbarSidebar";
@@ -20,7 +21,7 @@ const SignUp = () => {
   useEffect(() => {
     const checkUsersExist = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/users/exists");
+        const response = await api.get("/users/exists");
         const result = await response.json();
         setUsersExist(result.exists);
       } catch (err) {
@@ -96,10 +97,9 @@ const SignUp = () => {
 
     try {
       const response = await api.post("/signup", formData);
-      const result = await response.json();
 
-      if (response.ok) {
-        alert("User created successfully!");
+      if (response.status === 200 || response.status === 201) {
+        toast.success("User created successfully!");
         setFormData({
           fullname: "",
           username: "",
@@ -107,12 +107,12 @@ const SignUp = () => {
           password: "",
           role: "user",
         });
-        navigate("/"); // Redirect to login
+        navigate("/");
       } else {
-        alert(result.detail || "Signup failed.");
+        toast.error(response.data.detail || "Signup failed.");
       }
     } catch (err) {
-      alert("Network error. Please try again.");
+      toast.error("Network error. Please try again.");
       console.error(err);
     }
   };

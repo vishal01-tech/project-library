@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "../assets/styles/Home.css";
 
 
 
 function NavbarSidebar({
-  userRole, handleLogout,
+  userRole
 }) {
   const [email, setEmail] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
@@ -15,6 +17,14 @@ function NavbarSidebar({
       setEmail(storedEmail);
     }
   }, []);
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("email");
+    localStorage.removeItem("userRole");
+    toast.success("Logged out successfully");
+    navigate("/");
+  };
 
   return (
     <>

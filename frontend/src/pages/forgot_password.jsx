@@ -19,21 +19,14 @@ function Forgotpassword() {
     } else {
       setErrors(""); // Clear errors if email is valid
       try {
-        const response = await api.post("/forgot-password", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: forgotEmail }),
-        });
-        const data = await response.json();
-        if (response.ok) {
-          alert(data.message);
-          if (data.otp) {
-            alert(`Your OTP is: ${data.otp}`);
+        const response = await api.post("/forgot-password", { email: forgotEmail });
+        if (response.status === 200 || response.status === 201) {
+          alert(response.data.message);
+          if (response.data.otp) {
+            alert(`Your OTP is: ${response.data.otp}`);
           }
         } else {
-          setErrors(data.detail || "Failed to send OTP");
+          setErrors(response.data.detail || "Failed to send OTP");
         }
       } catch (error) {
         setErrors("Failed to send OTP");

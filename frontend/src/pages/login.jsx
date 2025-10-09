@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api"; 
-import { toast, ToastContainer } from "react-toastify"; 
+import { toast } from "react-toastify";
 import "../assets/styles/login.css";
-
-import "react-toastify/dist/ReactToastify.css"; 
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -38,7 +36,7 @@ const Login = () => {
     setErrors((prev) => ({ ...prev, [field]: "" })); // Reset error on input change
   };
 
-  // Handle input blur (on lose focus)
+  // Handle input blur when losing focus
   const handleBlur = (e, field) => {
     const value = e.target.value;
     const error = validateField(value, field);
@@ -78,16 +76,14 @@ const Login = () => {
 
       console.log("Login successful", response.data);
 
-      // Store tokens and user details in local storage after successful login
+      // Store tokens and user details in local storage 
       localStorage.setItem("access_token", response.data.access_token);
-      localStorage.setItem("userRole", response.data.role);
-      localStorage.setItem("email", response.data.email);
 
       // Set cookie for backend auth
-      document.cookie = `access_token=${response.data.access_token}; path=/; max-age=${30 * 60}`; // 30 minutes
+      document.cookie = `access_token=${response.data.access_token}; path=/; max-age=${180 * 60}`; // 3 hrs
 
       // Show a success toast
-      toast.success("Login successful! Redirecting...");
+      toast.success("Login successful..");
 
       // Redirect to home page after login
       navigate("/home");
@@ -96,10 +92,13 @@ const Login = () => {
 
       // If server returns specific error messages, display them
       if (error.response?.status === 401) {
-        if (error.response?.data?.message === "Invalid email") {
+        // Check if the error message is related to "Invalid email"
+        if (error.response.data?.message === "Invalid email") {
           setErrors((prev) => ({ ...prev, email: "Email is incorrect." }));
           toast.error("Email is incorrect.");
-        } else if (error.response?.data?.message === "Invalid password") {
+        }
+        // Check if the error message is related to "Invalid password"
+        else if (error.response.data?.message === "Invalid password") {
           setErrors((prev) => ({
             ...prev,
             password: "Password is incorrect.",
@@ -107,13 +106,15 @@ const Login = () => {
           toast.error("Password is incorrect.");
         }
       } else {
-        // Generic error message if not specifically handled
+        // Generic error message if the status is not 401 or message is something else
         setErrors((prev) => ({
           ...prev,
+          email: "An error occurred. Please try again.", // You can generalize this if needed
           password: "An error occurred. Please try again.",
         }));
         toast.error("An error occurred. Please try again.");
       }
+
     }
   }
 
@@ -176,9 +177,6 @@ const Login = () => {
           </Link>
         </form>
       </div>
-
-      {/* Toast Container for displaying toast messages */}
-      <ToastContainer />
     </>
   );
 };

@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
-from backend.app.database.database import get_db
+from app.database.database import get_db
 from app.schemas.users import UserLogin, UserCreate, TokenResponse, ForgotPasswordRequest, ResetPasswordRequest
 from app.crud.users import authenticate_user, create_user, users_exist, forgot_password, reset_password
-from app.utils.auth import create_access_token, get_current_user_with_role, verify_access_token
+from app.utils.auth import create_access_token, verify_access_token
+from app.responses import success_response, error_response
 from datetime import timedelta
 
 router = APIRouter()
@@ -13,7 +14,7 @@ router = APIRouter()
 def login(user_login: UserLogin, db: Session = Depends(get_db)):
     user = authenticate_user(db, user_login.email, user_login.password)
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        return error_response(message="Invalid email or password", status_code=401)
 
     token_data = {"sub": user.email}
     access_token = create_access_token(data=token_data, time_delta=timedelta(minutes=30))
@@ -26,8 +27,9 @@ def signup(user: UserCreate, request: Request, db: Session = Depends(get_db)):
     # Check if any users exist
     if not users_exist(db):
         # First user, allow super_admin role
-        if user.role != "super_admin":
-            raise HTTPException(status_code=400, detail="First user must be super_admin")
+        pass
+        # if user.role != "super_admin":
+        #     return error_response(message="First user must be super_admin", status_code=400)
     else:
         # Allow creation of 'user' role without authentication
         if user.role == "user":
@@ -36,32 +38,36 @@ def signup(user: UserCreate, request: Request, db: Session = Depends(get_db)):
             # Subsequent users require super_admin authentication for other roles
             token = request.cookies.get("access_token")
             if not token:
-                raise HTTPException(status_code=401, detail="Not authenticated")
+                return error_response(message="Not authenticated", status_code=401)
             payload = verify_access_token(token)
             if not payload:
-                raise HTTPException(status_code=401, detail="Invalid token")
+                return error_response(message="Invalid token", status_code=401)
             from app.crud.users import get_user_by_email
             current_user = get_user_by_email(db, payload.get("sub"))
             if not current_user or current_user.role != "super_admin":
-                raise HTTPException(status_code=403, detail="Insufficient permissions")
+                return error_response(message="Insufficient permissions", status_code=403)
 
     new_user = create_user(db, user)
-    return {"message": "User created successfully", "user_id": new_user.id}
+    return success_response(message="User created successfully", data={"user_id": new_user.id})
 
 # GET check if any users exist
 @router.get("/users/exists")
 def check_users_exist(db: Session = Depends(get_db)):
     exists = users_exist(db)
-    return {"exists": exists}
+    return success_response(data={"exists": exists})
 
 # POST forgot password
 @router.post("/forgot-password")
 def forgot_password_route(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
     otp = forgot_password(db, request)
-    # TODO: Send email
-    return {"message": "OTP sent to your email", "otp": otp}  # For testing
+
+    return success_response(message="OTP sent to your email", data={"otp": otp})
 
 # POST reset password
 @router.post("/reset-password")
 def reset_password_route(request: ResetPasswordRequest, db: Session = Depends(get_db)):
-    return reset_password(db, request)
+    result = reset_password(db, request)
+    if result.get("success"):
+        return success_response(message=result.get("message", "Password reset successful"))
+    else:
+        return error_response(message=result.get("message", "Password reset failed"))

@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
 from sqlalchemy.orm import Session
-from backend.app.database.database import get_db
+from app.database.database import get_db
 from app.schemas.books import BookUpdate
 from app.crud.books import create_book, get_books, get_book_by_id, update_book, delete_book
 from app.utils.auth import get_current_user_with_role
+from app.responses import success_response, error_response
 import shutil
-import os
+
 
 router = APIRouter()
 
@@ -18,7 +19,6 @@ def add_books(
     category: str = Form(...),
     image: UploadFile = File(None),
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user_with_role)
 ):
     try:
         quantity_int = int(quantity)
@@ -28,15 +28,15 @@ def add_books(
     image_path = None
     if image:
         # Save the uploaded file
-        file_location = f"app/uploads/{image.filename}"
+        file_location = f"app/media/{image.filename}"
         with open(file_location, "wb") as file_object:
             shutil.copyfileobj(image.file, file_object)
-        image_path = f"/uploads/{image.filename}"
+        image_path = f"/media/{image.filename}"
 
     from app.schemas.books import BookCreate
     book_data = BookCreate(title=title, author=author, quantity=quantity_int, category=category)
     new_book = create_book(db, book_data, image_path)
-    return {"message": "Book added successfully"}
+    return success_response({"message": "Book added successfully"})
 
 # GET books
 @router.get("/books")
@@ -53,7 +53,7 @@ def get_book(book_id: int, db: Session = Depends(get_db)):
 
 # PUT update book
 @router.put("/books/{book_id}")
-def update_book_route(
+def update_book(
     book_id: int,
     title: str = Form(None),
     author: str = Form(None),
@@ -61,7 +61,6 @@ def update_book_route(
     category: str = Form(None),
     image: UploadFile = File(None),
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user_with_role)
 ):
     update_data = {}
     if title is not None:
@@ -72,7 +71,7 @@ def update_book_route(
         try:
             quantity_int = int(quantity)
         except ValueError:
-            raise HTTPException(status_code=400, detail="Quantity must be a valid integer")
+            raise error_response(status_code=400, detail="Quantity must be a valid integer")
         update_data['quantity'] = quantity_int
     if category is not None:
         update_data['category'] = category
@@ -80,10 +79,10 @@ def update_book_route(
     image_path = None
     if image:
         # Save the uploaded file
-        file_location = f"app/uploads/{image.filename}"
+        file_location = f"app/media/{image.filename}"
         with open(file_location, "wb") as file_object:
             shutil.copyfileobj(image.file, file_object)
-        image_path = f"/uploads/{image.filename}"
+        image_path = f"/media/{image.filename}"
 
     book_update = BookUpdate(**update_data)
     updated_book = update_book(db, book_id, book_update, image_path)
@@ -91,5 +90,5 @@ def update_book_route(
 
 # DELETE book
 @router.delete("/books/{book_id}")
-def delete_book_route(book_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
+def delete_book(book_id: int, db: Session = Depends(get_db)):
     return delete_book(db, book_id)

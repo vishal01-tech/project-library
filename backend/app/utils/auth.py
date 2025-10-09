@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from jose import jwt, JWTError
 from fastapi import Request, HTTPException, Depends
 from sqlalchemy.orm import Session
-from backend.app.database.database import SessionLocal
+from app.database.database import SessionLocal
 from app.models import Users
 
 
