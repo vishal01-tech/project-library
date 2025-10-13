@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.schemas.books import BookUpdate
 from app.crud.books import create_book, get_books, get_book_by_id, update_book, delete_book
-from app.utils.auth import get_current_user_with_role
 from app.responses import success_response, error_response
 import shutil
 

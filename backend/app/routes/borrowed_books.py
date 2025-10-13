@@ -15,10 +15,12 @@ def issue_book_route(borrowed: BorrowedCreate, db: Session = Depends(get_db), cu
     new_borrowed = issue_book(db, borrowed)
     return success_response({"message": "Book issued successfully"})
 
+
 # POST return book
 @router.post("/returnbook")
 def return_book_route(return_data: ReturnBook, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
     return return_book(db, return_data)
+
 
 # GET borrowed books
 @router.get("/borrowed")

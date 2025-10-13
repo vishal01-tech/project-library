@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const ProtectedRoute = ({ children, isAuthRequired = true }) => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("access_token");
+  const token = Cookies.get("access_token");
 
   useEffect(() => {
     if (isAuthRequired && !token) {

@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import "../assets/styles/Home.css";
 import {useNavigate } from "react-router-dom";
 import NavbarSidebar from "../components/NavbarSidebar";
-import api from "../api/api"; 
+import api from "../api/api";
+
 
 const Home = () => {
   const baseURL = api.defaults.baseURL;
@@ -16,6 +17,7 @@ const Home = () => {
   useEffect(() => {
     // Get user role from localStorage or cookie
     const role = localStorage.getItem("userRole") || "user";
+    // const role = Cookies.get("email") || "user";
     setUserRole(role);
 
     // Fetch books
@@ -53,11 +55,9 @@ const Home = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("email");
-    // Clear cookie
-    document.cookie = "access_token=; path=/; max-age=0";
+    Cookies.remove("access_token");
+    // localStorage.removeItem("userRole");
+    // localStorage.removeItem("email");
     // Navigate to login
     navigate("/");
   };

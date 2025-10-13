@@ -13,6 +13,7 @@ import ReturnBooks from "./pages/return_books";
 import NotFound from "./pages/NotFound"
 import MemberList from "./pages/MemberList"
 import ProtectedRoute from "./components/ProtectedRoute";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -113,6 +114,7 @@ function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Footer/>
     </Router>
   );
 }

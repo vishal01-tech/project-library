@@ -5,6 +5,7 @@ import "../assets/styles/issue_books.css";
 // import "../home/Home.css";
 import NavbarSidebar from "../components/NavbarSidebar";
 import api from "../api/api";
+import Cookies from "js-cookie";
 
 const IssueBooks = () => {
   const [members, setMembers] = useState([]);
@@ -35,8 +36,8 @@ const IssueBooks = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('userRole');
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('email');
+    Cookies.remove("access_token");
+    Cookies.remove("email");
     toast.success("Logged out successfully!");
   };
 
@@ -77,7 +78,7 @@ const IssueBooks = () => {
 
   return (
     <div className="home">
-      <NavbarSidebar/>
+      <NavbarSidebar userRole={userRole}/>
       <div className="main-content">
         <div className="issue-books">
           <div className="issue-books-form">

@@ -13,18 +13,7 @@ body {
     margin: 0;
 }
 
-/* .issue-books-img {
-    width: 100px;
-    height: 20vh;
-    margin-left: 550px;
-}
 
-.issue-books-img img {
-    height: 500px;
-    width: 400px;
-    margin-top: 150px;
-    margin-left: 550px;
-} */
 
 .issue-books-form {
     width: 350px;
@@ -35,7 +24,7 @@ body {
     justify-content: center;
     margin-top: 100px;
     height: 400px;
-    margin-right: 450px;
+    margin-left: 400px;
 }
 
 h3 {

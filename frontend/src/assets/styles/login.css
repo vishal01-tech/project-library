@@ -19,10 +19,11 @@ body {
 span{
   color: red !important;
 }
+
 .img {
   width: 100px;
   height: 20vh;
-  margin-left: 600px;
+  margin-left: 900px;
   img {
     height: 400px;
     width: 400px;
@@ -62,6 +63,7 @@ span{
   justify-content: center;
   margin-bottom: 100px;
   height: 400px;
+  margin-left: 300px;
 }
 
 h2 {

@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Body
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.schemas.users import UserLogin, UserCreate, TokenResponse, ForgotPasswordRequest, ResetPasswordRequest
 from app.crud.users import authenticate_user, create_user, users_exist, forgot_password, reset_password
 from app.utils.auth import create_access_token, verify_access_token
 from app.responses import success_response, error_response
-from datetime import timedelta
+from datetime import timedelta, datetime
+from app.models.users import Users
 
 router = APIRouter()
 
@@ -17,9 +18,9 @@ def login(user_login: UserLogin, db: Session = Depends(get_db)):
         return error_response(message="Invalid email or password", status_code=401)
 
     token_data = {"sub": user.email}
-    access_token = create_access_token(data=token_data, time_delta=timedelta(minutes=30))
+    access_token = create_access_token(data=token_data, time_delta=timedelta(hours=3))
 
-    return {"access_token": access_token, "token_type": "bearer", "email": user.email, "username": user.username, "role": user.role}
+    return success_response(data={"access_token": access_token, "token_type": "bearer", "email": user.email, "username": user.username, "role": user.role})
 
 # Signup API
 @router.post("/signup")
@@ -56,12 +57,26 @@ def check_users_exist(db: Session = Depends(get_db)):
     exists = users_exist(db)
     return success_response(data={"exists": exists})
 
+
 # POST forgot password
 @router.post("/forgot-password")
 def forgot_password_route(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
-    otp = forgot_password(db, request)
+    forgot_password(db, request)
 
-    return success_response(message="OTP sent to your email", data={"otp": otp})
+    return success_response(data=None, message="OTP sent to your email")
+
+
+# POST verify OTP
+@router.post("/verify-otp")
+def verify_otp_route(request: dict = Body(...), db: Session = Depends(get_db)):
+    email = request.get("email")
+    otp = request.get("otp")
+    user = db.query(Users).filter(Users.email == email).first()
+    if not user:
+        return error_response(message="User not found", status_code=404)
+    if user.otp != otp or user.otp_expiry < datetime.utcnow():
+        return error_response(message="Invalid or expired OTP", status_code=400)
+    return success_response(data=None, message="OTP verified")
 
 # POST reset password
 @router.post("/reset-password")

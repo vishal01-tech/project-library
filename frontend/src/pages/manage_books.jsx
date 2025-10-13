@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import api from "../api/api";
 import "../assets/styles/manage_books.css";
 import NavbarSidebar from "../components/NavbarSidebar";
+import Cookies from "js-cookie";
 
 
 const ManageBooks = () => {
@@ -41,9 +42,9 @@ const ManageBooks = () => {
   }, [id]);
 
   const handleLogout = () => {
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("email");
+    // localStorage.removeItem("userRole");
+    Cookies.remove("access_token");
+    Cookies.remove("email");
     toast.success("Logged out successfully!");
   };
 

@@ -8,7 +8,7 @@ import NavbarSidebar from "../components/NavbarSidebar";
 const SignUp = () => {
   const [formData, setFormData] = useState({
     fullname: "",
-    username: "",
+    // username: "",
     email: "",
     password: "",
     role: "user",
@@ -39,9 +39,9 @@ const SignUp = () => {
       case "fullname":
         if (!value.trim()) message = "Fullname is required.";
         break;
-      case "username":
-        if (!value.trim()) message = "Username is required.";
-        break;
+      // case "username":
+      //   if (!value.trim()) message = "Username is required.";
+      //   break;
       case "email":
         if (!value.trim()) message = "Email is required.";
         else if (!emailRegex.test(value)) message = "Invalid email format.";
@@ -58,7 +58,7 @@ const SignUp = () => {
   };
 
   const validateForm = () => {
-    const fieldNames = ["fullname", "username", "email", "password"];
+    const fieldNames = ["fullname","email", "password"];
     const newErrors = {};
 
     fieldNames.forEach((field) => {
@@ -102,7 +102,7 @@ const SignUp = () => {
         toast.success("User created successfully!");
         setFormData({
           fullname: "",
-          username: "",
+          // username: "",
           email: "",
           password: "",
           role: "user",
@@ -122,7 +122,7 @@ const SignUp = () => {
       <NavbarSidebar />
       <div className="signup-container">
         <div className="signup-form">
-          <h2>Sign Up</h2>
+          <h3>Add User</h3>
           <form onSubmit={handleSubmit} noValidate>
             <div className="form-group">
               <label>
@@ -140,7 +140,7 @@ const SignUp = () => {
                 <span className="error">{errors.fullname}</span>
               )}
             </div>
-
+{/* 
             <div className="form-group">
               <label>
                 Username <span>*</span>
@@ -156,7 +156,7 @@ const SignUp = () => {
               {errors.username && (
                 <span className="error">{errors.username}</span>
               )}
-            </div>
+            </div> */}
 
             <div className="form-group">
               <label>

@@ -4,6 +4,7 @@ import "../assets/styles/return_books.css";
 
 import api from "../api/api";
 import NavbarSidebar from "../components/NavbarSidebar";
+import Cookies from "js-cookie";
 
 const ReturnBooks = () => {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
@@ -42,9 +43,9 @@ const ReturnBooks = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("userRole");
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('email');
+    // localStorage.removeItem("userRole");
+    Cookies.remove("access_token");
+    Cookies.remove("email");
     toast.success("Logged out successfully!");
   };
 
@@ -88,7 +89,7 @@ const ReturnBooks = () => {
   return (
     <>
       <div className="home">
-        <NavbarSidebar />
+        <NavbarSidebar userRole={userRole} />
         <div className="main-content">
           <div className="return-books">
             <div className="return-books-list">

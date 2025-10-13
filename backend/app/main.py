@@ -1,14 +1,15 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-import os
-
-# Include routers
 from app.routes.users import router as users_router
 from app.routes.members import router as members_router
 from app.routes.books import router as books_router
 from app.routes.borrowed_books import router as borrowed_books_router
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
 
 # Ensure uploads directory exists
 os.makedirs("app/media", exist_ok=True)

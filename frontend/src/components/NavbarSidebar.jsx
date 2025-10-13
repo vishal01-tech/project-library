@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 import "../assets/styles/Home.css";
-
 
 
 function NavbarSidebar({
@@ -12,16 +12,16 @@ function NavbarSidebar({
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem("email");
+    const storedEmail = Cookies.get("email");
     if (storedEmail) {
       setEmail(storedEmail);
     }
   }, []);
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("email");
-    localStorage.removeItem("userRole");
+    Cookies.remove("access_token");
+    Cookies.remove("email");
+    // localStorage.removeItem("username");
+    // localStorage.removeItem("userRole");
     toast.success("Logged out successfully");
     navigate("/");
   };

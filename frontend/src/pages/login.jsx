@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../api/api"; 
+import api from "../api/api";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 import "../assets/styles/login.css";
 
 const Login = () => {
@@ -74,13 +75,11 @@ const Login = () => {
         password: password,
       });
 
-      console.log("Login successful", response.data);
-
-      // Store tokens and user details in local storage 
-      localStorage.setItem("access_token", response.data.access_token);
+      // console.log("Login successful", response.data);
 
       // Set cookie for backend auth
-      document.cookie = `access_token=${response.data.access_token}; path=/; max-age=${180 * 60}`; // 3 hrs
+      Cookies.set("access_token", response.data.data.access_token, { expires: 3 / 24 }); // 3 hours
+      Cookies.set("email", response.data.data.email, { expires: 3 / 24 }); // 3 hours
 
       // Show a success toast
       toast.success("Login successful..");
@@ -88,33 +87,6 @@ const Login = () => {
       // Redirect to home page after login
       navigate("/home");
     } catch (error) {
-      console.error("Login failed:", error.response?.data);
-
-      // If server returns specific error messages, display them
-      if (error.response?.status === 401) {
-        // Check if the error message is related to "Invalid email"
-        if (error.response.data?.message === "Invalid email") {
-          setErrors((prev) => ({ ...prev, email: "Email is incorrect." }));
-          toast.error("Email is incorrect.");
-        }
-        // Check if the error message is related to "Invalid password"
-        else if (error.response.data?.message === "Invalid password") {
-          setErrors((prev) => ({
-            ...prev,
-            password: "Password is incorrect.",
-          }));
-          toast.error("Password is incorrect.");
-        }
-      } else {
-        // Generic error message if the status is not 401 or message is something else
-        setErrors((prev) => ({
-          ...prev,
-          email: "An error occurred. Please try again.", // You can generalize this if needed
-          password: "An error occurred. Please try again.",
-        }));
-        toast.error("An error occurred. Please try again.");
-      }
-
     }
   }
 
@@ -179,6 +151,7 @@ const Login = () => {
       </div>
     </>
   );
-};
+  };
+  
 
 export default Login;

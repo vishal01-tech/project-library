@@ -84,9 +84,9 @@ function MemberList() {
                 padding: "10px",
               }}
             >
-              <h3>
+              <p>
                 <span>Name: </span> {member.name}
-              </h3>
+              </p>
               <p>
                 <span>Email: </span> {member.email}
               </p>
@@ -96,9 +96,9 @@ function MemberList() {
               <p>
                 <span>Address: </span> {member.address}
               </p>
-              <h4>
+              <h5>
                 <span>Borrowed Books:</span>
-              </h4>
+              </h5>
               <ul>
                 {memberBorrowedMap[member.id].map((b) => (
                   <li key={b.id}>

@@ -22,9 +22,10 @@ function Forgotpassword() {
         const response = await api.post("/forgot-password", { email: forgotEmail });
         if (response.status === 200 || response.status === 201) {
           alert(response.data.message);
-          if (response.data.otp) {
-            alert(`Your OTP is: ${response.data.otp}`);
-          }
+          // Store email in localStorage for reset password page
+          localStorage.setItem('resetEmail', forgotEmail);
+          // Redirect to reset password page
+          window.location.href = "/resetpassword";
         } else {
           setErrors(response.data.detail || "Failed to send OTP");
         }

@@ -5,7 +5,11 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 import random
 import string
-from fastapi import HTTPException, status
+from fastapi import HTTPException
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -56,6 +60,33 @@ def users_exist(db: Session):
 def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
 
+def send_email(to_email: str, otp: str):
+    smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+    smtp_port = int(os.getenv("SMTP_PORT", 587))
+    smtp_username = os.getenv("SMTP_USERNAME")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+
+    if not smtp_username or not smtp_password:
+        raise HTTPException(status_code=500, detail="SMTP credentials not configured")
+
+    msg = MIMEMultipart()
+    msg['From'] = smtp_username
+    msg['To'] = to_email
+    msg['Subject'] = "Your OTP for Password Reset"
+
+    body = f"Your OTP for password reset is: {otp}. It expires in 10 minutes."
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+        text = msg.as_string()
+        server.sendmail(smtp_username, to_email, text)
+        server.quit()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
+
 def forgot_password(db: Session, request: ForgotPasswordRequest):
     user = get_user_by_email(db, request.email)
     if not user:
@@ -70,9 +101,8 @@ def forgot_password(db: Session, request: ForgotPasswordRequest):
     user.otp_expiry = otp_expiry
     db.commit()
 
-    # TODO: Send email with OTP
-    # For now, return OTP for testing
-    return otp
+    # Send email with OTP
+    send_email(user.email, otp)
 
 def reset_password(db: Session, request: ResetPasswordRequest):
     user = get_user_by_email(db, request.email)
@@ -89,4 +119,4 @@ def reset_password(db: Session, request: ResetPasswordRequest):
     user.otp_expiry = None
     db.commit()
 
-    return {"message": "Password reset successfully"}
+    return {"success": True, "message": "Password reset successfully"}

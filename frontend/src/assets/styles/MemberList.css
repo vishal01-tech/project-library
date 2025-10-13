@@ -33,62 +33,11 @@ ul {
     background-color: #f7f7f7;
     font-family: 'Times New Roman', Times, serif;
     border-radius: 10px;
+    height: 70vh;
 
     
 }
 span{
-    color: black;
-    font-size: 1.3rem;
+    color: black !important;
+    font-size: 1.2rem;
 }
-
-
-/* 
-.main {
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr;
-  justify-items: center;
-  padding: 20px;
-  background-color: #f1f1f1;
-}
-
-ul {
-  list-style-type: none;
-  padding-left: 0;
-}
-
-.container {
-  background-color: #ffffff;
-  font-family: 'Times New Roman', Times, serif;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  max-width: 1200px;
-  width: 100%;
-  margin: 20px auto;
-  transition: transform 0.3s ease-in-out;
-}
-
-.container:hover {
-  transform: scale(1.02);
-}
-
-span {
-  color: #333;
-  font-size: 1.3rem;
-  font-weight: 400;
-}
-
-h1, h2 {
-  font-family: 'Times New Roman', serif;
-  color: #444;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-p {
-  margin: 15px 0;
-  line-height: 1.8;
-  color: #555;
-}
-

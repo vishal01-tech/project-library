@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import "../assets/styles/add_member.css";
 import api from "../api/api";
 import NavbarSidebar from "../components/NavbarSidebar";
+import Cookies from "js-cookie";
 
 const AddMember = () => {
   const [formData, setFormData] = useState({
@@ -25,8 +26,8 @@ const AddMember = () => {
 
   const handleLogout = () => {
     // localStorage.removeItem('userRole');
-    localStorage.removeItem('access_token');
-    // localStorage.removeItem('email');
+    Cookies.remove("access_token");
+    Cookies.remove("email");
     toast.success("Logged out successfully!");
   };
 
@@ -113,7 +114,7 @@ const AddMember = () => {
 
   return (
     <div className="home">
-      <NavbarSidebar/>
+      <NavbarSidebar userRole={userRole}/>
       <div className="main-content">
         <div className="add-member">
           {/* <div className="add-member-img">
