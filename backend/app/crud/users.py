@@ -1,15 +1,16 @@
+import os
+import random
+import string
+import smtplib
 from sqlalchemy.orm import Session
 from app.models.users import Users
 from app.schemas.users import UserCreate, ForgotPasswordRequest, ResetPasswordRequest
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-import random
-import string
 from fastapi import HTTPException
-import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import os
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -29,6 +30,7 @@ def authenticate_user(db: Session, email: str, password: str):
     if not verify_password(password, user.password):
         return False
     return user
+
 
 def create_user(db: Session, user: UserCreate):
     # Check if user already exists
@@ -86,6 +88,8 @@ def send_email(to_email: str, otp: str):
         server.quit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
+
+
 
 def forgot_password(db: Session, request: ForgotPasswordRequest):
     user = get_user_by_email(db, request.email)

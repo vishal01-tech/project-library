@@ -62,7 +62,6 @@ def check_users_exist(db: Session = Depends(get_db)):
 @router.post("/forgot-password")
 def forgot_password_route(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
     forgot_password(db, request)
-
     return success_response(data=None, message="OTP sent to your email")
 
 
@@ -77,6 +76,7 @@ def verify_otp_route(request: dict = Body(...), db: Session = Depends(get_db)):
     if user.otp != otp or user.otp_expiry < datetime.utcnow():
         return error_response(message="Invalid or expired OTP", status_code=400)
     return success_response(data=None, message="OTP verified")
+
 
 # POST reset password
 @router.post("/reset-password")

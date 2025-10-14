@@ -88,5 +88,5 @@ p {
 }
 
 span {
-    color: red;
+    color: red !important;
 }

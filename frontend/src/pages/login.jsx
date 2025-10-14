@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import "../assets/styles/login.css";
 
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -75,7 +76,6 @@ const Login = () => {
         password: password,
       });
 
-      // console.log("Login successful", response.data);
 
       // Set cookie for backend auth
       Cookies.set("access_token", response.data.data.access_token, { expires: 3 / 24 }); // 3 hours
@@ -95,14 +95,12 @@ const Login = () => {
       <nav className="nav">
         <h3>LibraryApp</h3>
       </nav>
-
       <div className="img">
         <img src="./images/image.png" alt="Library" loading="lazy" />
       </div>
 
       <div className="login-container">
         <h2>Login</h2>
-
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="email">

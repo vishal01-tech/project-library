@@ -50,17 +50,17 @@ function MemberList() {
 
   // Process data to map members to their borrowed books
   const memberBorrowedMap = {};
-  borrowed.forEach((b) => {
-    if (!memberBorrowedMap[b.member_id]) {
-      memberBorrowedMap[b.member_id] = [];
+  borrowed.forEach((borrow) => {
+    if (!memberBorrowedMap[borrow.member_id]) {
+      memberBorrowedMap[borrow.member_id] = [];
     }
-    const book = books.find((book) => book.id === b.book_id);
+    const book = books.find((book) => book.id === borrow.book_id);
     if (book) {
-      memberBorrowedMap[b.member_id].push({ ...b, book });
+      memberBorrowedMap[borrow.member_id].push({ ...borrow, book });
     }
   });
 
-  const membersWithBorrowed = members.filter((m) => memberBorrowedMap[m.id]);
+  const membersWithBorrowed = members.filter((member) => memberBorrowedMap[member.id]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -70,7 +70,7 @@ function MemberList() {
     <>
       <NavbarSidebar />
       <div className="main">
-        {/* <h2>Members with Borrowed Books</h2> */}
+        {/* <h3>Members with Borrowed Books</h3> */}
         {membersWithBorrowed.length === 0 ? (
           <p>No members have borrowed books.</p>
         ) : (

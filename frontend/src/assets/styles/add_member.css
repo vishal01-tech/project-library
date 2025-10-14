@@ -89,3 +89,7 @@ p {
 .span {
     color: red;
 }
+
+span {
+    color: red !important;
+}
