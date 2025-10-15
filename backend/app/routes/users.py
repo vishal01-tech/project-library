@@ -4,7 +4,7 @@ from app.database.database import get_db
 from app.schemas.users import UserLogin, UserCreate, TokenResponse, ForgotPasswordRequest, ResetPasswordRequest
 from app.crud.users import authenticate_user, create_user, users_exist, forgot_password, reset_password
 from app.utils.auth import create_access_token, verify_access_token
-from app.responses import success_response, error_response
+from app.utils.responses import success_response, error_response
 from datetime import timedelta, datetime
 from app.models.users import Users
 

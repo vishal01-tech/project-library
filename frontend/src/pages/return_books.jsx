@@ -9,8 +9,9 @@ import Cookies from "js-cookie";
 const ReturnBooks = () => {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [members, setMembers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterMembers, setfilterMembers] = useState([]);
   const [books, setBooks] = useState([]);
-
   const [userRole, setUserRole] = useState("user");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -43,7 +44,6 @@ const ReturnBooks = () => {
   }, []);
 
   const handleLogout = () => {
-    // localStorage.removeItem("userRole");
     Cookies.remove("access_token");
     Cookies.remove("email");
     toast.success("Logged out successfully!");
@@ -53,11 +53,31 @@ const ReturnBooks = () => {
     const member = members.find((m) => m.id === memberId);
     return member?.name || "Unknown Member";
   };
+  const getMemberEmail = (memberId) => {
+    const member = members.find((m) => m.id === memberId)
+    return member?.email || "Email not found"
+  };
 
   const getBookTitle = (bookId) => {
     const book = books.find((b) => b.id === bookId);
     return book?.title || "Unknown Book";
   };
+
+   useEffect(() => {
+     // filter members by name
+     if (searchQuery.trim() === "") {
+       setfilterMembers(members);
+     } else {
+       const filtered = members.filter((member) =>
+         member.name.toLowerCase().includes(searchQuery.toLowerCase())
+       );
+       setfilterMembers(filtered);
+     }
+   }, [members, searchQuery]);
+  
+  const filteredBorrowedBooks = borrowedBooks.filter((borrow) =>
+    filterMembers.some((member) => member.id === borrow.member_id)
+  );
 
   const handleReturn = async (borrowedId) => {
     try {
@@ -89,35 +109,55 @@ const ReturnBooks = () => {
   return (
     <>
       <div className="home">
-        <NavbarSidebar userRole={userRole} />
+        <NavbarSidebar handleLogout={handleLogout} />
         <div className="main-content">
           <div className="return-books">
             <div className="return-books-list">
               <h3>Return Book</h3>
-              {borrowedBooks.length === 0 ? (
-                <p>No books are currently borrowed.</p>
-              ) : (
-                <ul>
-                  {borrowedBooks.map((borrowed) => (
-                    <li key={borrowed.id} className="borrowed-item">
-                      <div>
-                        <strong>Member:</strong>{" "}
-                        {getMemberName(borrowed.member_id)} <br />
-                        <strong>Book:</strong> {getBookTitle(borrowed.book_id)}{" "}
-                        <br />
-                        <strong>Borrowed At:</strong>{" "}
-                        {new Date(borrowed.borrowed_at).toLocaleString()}
-                      </div>
-                      <button
-                        onClick={() => handleReturn(borrowed.id)}
-                        className="button"
-                      >
-                        Return Book
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <input
+                type="text"
+                placeholder="Search member by name"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-bar"
+              />
+              <table>
+                <thead>
+                  <tr>
+                    <th>Member Name</th>
+                    <th>Email</th>
+                    <th>Book Title</th>
+                    <th>Borrowed At</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredBorrowedBooks.length === 0 ? (
+                    <tr>
+                      <td colSpan="4">No books are currently borrowed</td>
+                    </tr>
+                  ) : (
+                    filteredBorrowedBooks.map((borrowed) => (
+                      <tr key={borrowed.id}>
+                        <td>{getMemberName(borrowed.member_id)}</td>
+                        <td>{getMemberEmail(borrowed.member_id)}</td>
+                        <td>{getBookTitle(borrowed.book_id)}</td>
+                        <td>
+                          {new Date(borrowed.borrowed_at).toLocaleString()}
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => handleReturn(borrowed.id)}
+                            className="button"
+                          >
+                            Return Book
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

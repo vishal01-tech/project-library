@@ -7,7 +7,7 @@ import NavbarSidebar from "../components/NavbarSidebar";
 import Cookies from "js-cookie";
 
 
-const ManageBooks = () => {
+function ManageBooks() {
   const baseURL = api.defaults.baseURL;
   const [books, setBooks] = useState([]);
   const [editingBook, setEditingBook] = useState(null);
@@ -42,7 +42,6 @@ const ManageBooks = () => {
   }, [id]);
 
   const handleLogout = () => {
-    // localStorage.removeItem("userRole");
     Cookies.remove("access_token");
     Cookies.remove("email");
     toast.success("Logged out successfully!");
@@ -186,26 +185,26 @@ const ManageBooks = () => {
     }
   };
 
-  const handleEdit = (book) => {
-    setEditingBook(book);
-    setFormdata({
-      title: book.title,
-      author: book.author,
-      quantity: book.quantity.toString(),
-      category: book.category,
-      image: null,
-    });
-    // Set preview to existing image if available
-    if (book.image) {
-      setImagePreview(
-        book.image.startsWith("/media")
-          ? `${baseURL}${book.image}`
-          : book.image
-      );
-    } else {
-      setImagePreview(null);
-    }
-  };
+  // const handleEdit = (book) => {
+  //   setEditingBook(book);
+  //   setFormdata({
+  //     title: book.title,
+  //     author: book.author,
+  //     quantity: book.quantity.toString(),
+  //     category: book.category,
+  //     image: null,
+  //   });
+  //   // Set preview to existing image if available
+  //   if (book.image) {
+  //     setImagePreview(
+  //       book.image.startsWith("/media")
+  //         ? `${baseURL}${book.image}`
+  //         : book.image
+  //     );
+  //   } else {
+  //     setImagePreview(null);
+  //   }
+  // };
 
   const handleDelete = async (bookId) => {
     if (window.confirm("Are you sure you want to delete this book?")) {
@@ -224,31 +223,25 @@ const ManageBooks = () => {
     }
   };
 
-  const handleCancel = () => {
-    setEditingBook(null);
-    setFormdata({
-      title: "",
-      author: "",
-      quantity: "",
-      category: "",
-      image: null,
-    });
-    setImagePreview(null);
-  };
+  // const handleCancel = () => {
+  //   setEditingBook(null);
+  //   setFormdata({
+  //     title: "",
+  //     author: "",
+  //     quantity: "",
+  //     category: "",
+  //     image: null,
+  //   });
+  //   setImagePreview(null);
+  // };
 
   return (
     <div className="home">
       <NavbarSidebar
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
         userRole={userRole}
-        handleLogout={handleLogout}
-      />
+        handleLogout={handleLogout} />
       <div className="main-content">
         <div className="manage-container">
-          {/* <div className="manage-img">
-            <img src="./images/image.png" alt="Library" />
-          </div> */}
           <div className="add-books">
             <h3>Add Books</h3>
             <form onSubmit={handleSubmit} noValidate>
@@ -263,8 +256,7 @@ const ManageBooks = () => {
                   value={formData.title}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  placeholder="Enter the title"
-                />
+                  placeholder="Enter the title" />
                 {errors.title && <span className="error">{errors.title}</span>}
               </div>
               <div className="form-group">
@@ -278,8 +270,7 @@ const ManageBooks = () => {
                   value={formData.author}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  placeholder="Enter the author name"
-                />
+                  placeholder="Enter the author name" />
                 {errors.author && (
                   <span className="error">{errors.author}</span>
                 )}
@@ -295,8 +286,7 @@ const ManageBooks = () => {
                   value={formData.quantity}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  placeholder="Enter the quantity"
-                />
+                  placeholder="Enter the quantity" />
                 {errors.quantity && (
                   <span className="error">{errors.quantity}</span>
                 )}
@@ -339,8 +329,7 @@ const ManageBooks = () => {
                       const previewUrl = URL.createObjectURL(file);
                       setImagePreview(previewUrl);
                     }
-                  }}
-                />
+                  } } />
                 {imagePreview && (
                   <img
                     src={imagePreview}
@@ -349,41 +338,33 @@ const ManageBooks = () => {
                       width: "100px",
                       height: "100px",
                       marginTop: "10px",
-                    }}
-                  />
+                    }} />
                 )}
               </div>
               <div className="form-buttons">
                 <button type="submit" className="button">
                   {editingBook ? "UPDATE" : "ADD"}
                 </button>
-                {/* {editingBook && (
-                  <button
-                    type="button"
-                    className="button cancel-btn"
-                    onClick={handleCancel}
-                  >
-                    CANCEL
-                  </button>
-                )} */}
               </div>
             </form>
           </div>
         </div>
-        <div className="books-list">
+        {/* <div className="books-list">
           <h2>Books</h2>
           <div className="books-table">
             {books.map((book) => (
               <div key={book.id} className="book-row">
                 <div className="book-details">
-                  <img
-                    src={`${baseURL}${book.image}`}
-                    alt={book.title}
-                    className="book-thumb"
-                    onError={(e) => {
-                      e.target.src = "/images/image.png";
-                    }}
-                  />
+                  {book.image ? (
+                    <img
+                      src={`${baseURL}${book.image}`}
+                      alt={book.title}
+                      className="book-thumb" />
+                  ) : (
+                    <div className="book-thumb no-image">
+                      Image not available
+                    </div>
+                  )}
                   <div className="book-text">
                     <h3>{book.title}</h3>
                     <p>by {book.author}</p>
@@ -405,10 +386,10 @@ const ManageBooks = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
-};
+}
 
 export default ManageBooks;

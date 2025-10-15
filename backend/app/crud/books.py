@@ -29,7 +29,7 @@ def get_books(db: Session, page: int = 1, limit: int = 12):
 def get_book_by_id(db: Session, book_id: int):
     return db.query(Books).filter(Books.id == book_id).first()
 
-def update_book(db: Session, book_id: int, book_update: BookUpdate, image_path: str = None):
+def update_book_crud(db: Session, book_id: int, book_update: BookUpdate, image_path: str = None):
     book = get_book_by_id(db, book_id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")

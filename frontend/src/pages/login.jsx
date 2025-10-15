@@ -6,10 +6,11 @@ import Cookies from "js-cookie";
 import "../assets/styles/login.css";
 
 
-const Login = () => {
+function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "" });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   // Field validation function
@@ -17,8 +18,8 @@ const Login = () => {
     switch (field) {
       case "email":
         if (!value.trim()) return "Email is required.";
-        if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value))
-          return "Invalid email format.";
+        // if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value))
+        //   return "Invalid email format.";
         break;
       case "password":
         if (!value.trim()) return "Password is required.";
@@ -70,6 +71,8 @@ const Login = () => {
 
     if (!valid) return;
 
+    setIsLoading(true);
+
     try {
       const response = await api.post("/login", {
         email: email,
@@ -81,12 +84,20 @@ const Login = () => {
       Cookies.set("access_token", response.data.data.access_token, { expires: 3 / 24 }); // 3 hours
       Cookies.set("email", response.data.data.email, { expires: 3 / 24 }); // 3 hours
 
+
       // Show a success toast
       toast.success("Login successful..");
 
       // Redirect to home page after login
       navigate("/home");
     } catch (error) {
+      if (error.response && error.response.status === 401) {
+        toast.error("Invalid email or password");
+      } else {
+        toast.error("An error occurred during login. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -113,8 +124,7 @@ const Login = () => {
               value={email}
               onChange={(e) => handleChange(e, "email")}
               onBlur={(e) => handleBlur(e, "email")}
-              required
-            />
+              required />
             {errors.email && (
               <span className="error-message">{errors.email}</span>
             )}
@@ -131,15 +141,22 @@ const Login = () => {
               value={password}
               onChange={(e) => handleChange(e, "password")}
               onBlur={(e) => handleBlur(e, "password")}
-              required
-            />
+              required />
             {errors.password && (
               <span className="error-message">{errors.password}</span>
             )}
           </div>
 
           <div className="btn">
-            <button type="submit">Log In</button>
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <span className="spinner"></span> Logging In...
+                </>
+              ) : (
+                "Log In"
+              )}
+            </button>
           </div>
 
           <Link to="/forgotpassword">
@@ -149,7 +166,7 @@ const Login = () => {
       </div>
     </>
   );
-  };
+}
   
 
 export default Login;

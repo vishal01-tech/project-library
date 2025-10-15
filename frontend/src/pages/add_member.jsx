@@ -6,7 +6,7 @@ import api from "../api/api";
 import NavbarSidebar from "../components/NavbarSidebar";
 import Cookies from "js-cookie";
 
-const AddMember = () => {
+function AddMember() {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -25,7 +25,6 @@ const AddMember = () => {
   }, []);
 
   const handleLogout = () => {
-    // localStorage.removeItem('userRole');
     Cookies.remove("access_token");
     Cookies.remove("email");
     toast.success("Logged out successfully!");
@@ -51,8 +50,8 @@ const AddMember = () => {
           else if (!emailRegex.test(value)) message = "Invalid email format.";
           break;
         case "address":
-          if (!value.trim()) message = "Address is required"
-          break
+          if (!value.trim()) message = "Address is required";
+          break;
         default:
           break;
       }
@@ -62,7 +61,7 @@ const AddMember = () => {
   };
 
   const validateForm = () => {
-    const fieldNames = ["name", "phone", "email","address"];
+    const fieldNames = ["name", "phone", "email", "address"];
     const newErrors = {};
 
     fieldNames.forEach((field) => {
@@ -100,7 +99,7 @@ const AddMember = () => {
           name: "",
           phone: "",
           email: "",
-          address:""
+          address: ""
         });
         navigate("/home"); // Redirect to home page
       } else {
@@ -114,13 +113,9 @@ const AddMember = () => {
 
   return (
     <div className="home">
-      <NavbarSidebar userRole={userRole}/>
+      <NavbarSidebar userRole={userRole} handleLogout = {handleLogout} />
       <div className="main-content">
         <div className="add-member">
-          {/* <div className="add-member-img">
-            <img src="./images/image.png" alt="image not found" />
-          </div> */}
-
           <div className="add-member-form">
             <h3>Add Member</h3>
             <form onSubmit={handleSubmit} noValidate>
@@ -135,8 +130,7 @@ const AddMember = () => {
                   value={formData.name}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  placeholder="Enter your fullname"
-                />
+                  placeholder="Enter your fullname" />
                 {errors.name && <span className="error">{errors.name}</span>}
               </div>
 
@@ -151,8 +145,7 @@ const AddMember = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  placeholder="Enter your phone number"
-                />
+                  placeholder="Enter your phone number" />
                 {errors.phone && <span className="error">{errors.phone}</span>}
               </div>
 
@@ -167,14 +160,13 @@ const AddMember = () => {
                   value={formData.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  placeholder="Enter your email"
-                />
+                  placeholder="Enter your email" />
                 {errors.email && <span className="error">{errors.email}</span>}
               </div>
               <div className="form-group">
                 <label htmlFor="address">Address <span>*</span></label>
                 <input type="address" id="address" name="address" value={formData.address} onChange={handleChange} onBlur={handleBlur} placeholder="Enter your address" />
-                {errors.address && <span className="error">{ errors.address}</span>}
+                {errors.address && <span className="error">{errors.address}</span>}
               </div>
 
               <button type="submit" className="button">
@@ -186,6 +178,6 @@ const AddMember = () => {
       </div>
     </div>
   );
-};
+}
 
 export default AddMember;

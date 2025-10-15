@@ -4,7 +4,8 @@ from app.database.database import get_db
 from app.schemas.members import MemberCreate
 from app.crud.members import create_member, get_members
 from app.utils.auth import get_current_user_with_role
-from app.responses import success_response
+from app.utils.responses import success_response
+
 
 
 router = APIRouter()

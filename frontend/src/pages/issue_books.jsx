@@ -1,41 +1,42 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import "../assets/styles/issue_books.css";
-
-// import "../home/Home.css";
 import NavbarSidebar from "../components/NavbarSidebar";
 import api from "../api/api";
 import Cookies from "js-cookie";
 
-const IssueBooks = () => {
+function IssueBooks() {
   const [members, setMembers] = useState([]);
   const [books, setBooks] = useState([]);
   const [formData, setFormData] = useState({
-    member_id: "",
-    book_id: ""
+    member_phone: "",
+    book_id: "",
   });
   const [errors, setErrors] = useState({});
-
-  const [userRole, setUserRole] = useState('user');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [bookSearch, setBookSearch] = useState("");
+  const [memberSearch, setMemberSearch] = useState("");
+  const [showMemberDropdown, setShowMemberDropdown] = useState(false);
+  const [showBookDropdown, setShowBookDropdown] = useState(false);
+  const [userRole, setUserRole] = useState("user");
 
   useEffect(() => {
-    api.get("/members")
+    api
+      .get("/members")
       .then((response) => setMembers(response.data))
       .catch((err) => console.error("Failed to fetch members", err));
 
-    api.get("/books")
+    api
+      .get("/books")
       .then((response) => setBooks(response.data.data))
       .catch((err) => console.error("Failed to fetch books", err));
   }, []);
 
-  useEffect(() => {
-    const role = localStorage.getItem('userRole') || 'user';
-    setUserRole(role);
-  }, []);
-
+  // useEffect(() => {
+  //   const role = localStorage.getItem("userRole") || "user";
+  //   setUserRole(role);
+  // }, []);
   const handleLogout = () => {
-    localStorage.removeItem('userRole');
+    localStorage.removeItem("userRole");
     Cookies.remove("access_token");
     Cookies.remove("email");
     toast.success("Logged out successfully!");
@@ -43,15 +44,15 @@ const IssueBooks = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.member_id) newErrors.member_id = "Member is required";
+    if (!formData.member_phone) newErrors.member_phone = "Member is required";
     if (!formData.book_id) newErrors.book_id = "Book is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
-    setFormData({...formData, [e.target.name]: e.target.value});
-    setErrors({...errors, [e.target.name]: ""});
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
   const handleSubmit = async (e) => {
@@ -59,14 +60,21 @@ const IssueBooks = () => {
     if (!validateForm()) return;
 
     try {
-      const response = await api.post("/issuebook", {
-        member_id: parseInt(formData.member_id),
-        book_id: parseInt(formData.book_id)
+      const formDataToSend = new FormData();
+      formDataToSend.append("member_phone", formData.member_phone);
+      formDataToSend.append("book_id", formData.book_id);
+
+      const response = await api.post("/issuebook", formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
       const result = response.data;
       if (response.status === 200) {
         toast.success("Book issued successfully!");
-        setFormData({member_id: "", book_id: ""});
+        setFormData({ member_phone: "", book_id: "" });
+        setBookSearch("");
+        setMemberSearch("");
       } else {
         toast.error(result.detail || "Failed to issue book.");
       }
@@ -78,41 +86,105 @@ const IssueBooks = () => {
 
   return (
     <div className="home">
-      <NavbarSidebar userRole={userRole}/>
+      <NavbarSidebar userRole={userRole} />
       <div className="main-content">
         <div className="issue-books">
           <div className="issue-books-form">
             <h3>Issue Book</h3>
             <form onSubmit={handleSubmit} noValidate>
               <div className="form-group">
-                <label>Member <span>*</span></label>
-                <select name="member_id" value={formData.member_id} onChange={handleChange}>
-                  <option value="">Select Member</option>
-                  {members.map((member) => (
-                    <option key={member.id} value={member.id}>{member.name}</option>
-                  ))}
-                </select>
-                {errors.member_id && <span className="error">{errors.member_id}</span>}
+                <label>
+                  Search Member <span>*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Search by name or number"
+                  value={memberSearch}
+                  onChange={(e) => {
+                    setMemberSearch(e.target.value);
+                    setShowMemberDropdown(true);
+                  } }
+                  onFocus={() => setShowMemberDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowMemberDropdown(false), 200)} />
+                {showMemberDropdown && memberSearch && (
+                  <div className="dropdown-list">
+                    {members
+                      .filter(
+                        (member) => member.name.toLowerCase().includes(memberSearch.toLowerCase()) ||
+                          member.phone.toString().includes(memberSearch)
+                      )
+                      .map((member) => (
+                        <div
+                          key={member.id}
+                          className="dropdown-item"
+                          onClick={() => {
+                            setFormData({ ...formData, member_phone: member.phone });
+                            setMemberSearch(`${member.name} - ${member.phone}`);
+                            setShowMemberDropdown(false);
+                            setErrors({ ...errors, member_phone: "" });
+                          } }
+                        >
+                          {member.name} - {member.phone}
+                        </div>
+                      ))}
+                  </div>
+                )}
+                {errors.member_phone && (
+                  <span className="error">{errors.member_phone}</span>
+                )}
               </div>
 
               <div className="form-group">
-                <label>Book <span>*</span></label>
-                <select name="book_id" value={formData.book_id} onChange={handleChange}>
-                  <option value="">Select Book</option>
-                  {books.map((book) => (
-                    <option key={book.id} value={book.id}>{book.title}</option>
-                  ))}
-                </select>
-                {errors.book_id && <span className="error">{errors.book_id}</span>}
+                <label>
+                  Search Book <span>*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Search by title or author"
+                  value={bookSearch}
+                  onChange={(e) => {
+                    setBookSearch(e.target.value);
+                    setShowBookDropdown(true);
+                  } }
+                  onFocus={() => setShowBookDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowBookDropdown(false), 200)} />
+                {showBookDropdown && bookSearch && (
+                  <div className="dropdown-list">
+                    {books
+                      .filter(
+                        (book) => book.title.toLowerCase().includes(bookSearch.toLowerCase()) ||
+                          book.author.toLowerCase().includes(bookSearch.toLowerCase())
+                      )
+                      .map((book) => (
+                        <div
+                          key={book.id}
+                          className="dropdown-item"
+                          onClick={() => {
+                            setFormData({ ...formData, book_id: book.id });
+                            setBookSearch(`${book.title} by ${book.author}`);
+                            setShowBookDropdown(false);
+                            setErrors({ ...errors, book_id: "" });
+                          } }
+                        >
+                          {book.title} by {book.author}
+                        </div>
+                      ))}
+                  </div>
+                )}
+                {errors.book_id && (
+                  <span className="error">{errors.book_id}</span>
+                )}
               </div>
 
-              <button type="submit" className="button">Issue Book</button>
+              <button type="submit" className="button">
+                Issue Book
+              </button>
             </form>
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default IssueBooks;

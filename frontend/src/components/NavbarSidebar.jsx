@@ -4,10 +4,7 @@ import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import "../assets/styles/Home.css";
 
-
-function NavbarSidebar({
-  userRole
-}) {
+function NavbarSidebar({ userRole }) {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
 
@@ -46,13 +43,13 @@ function NavbarSidebar({
             Home
           </Link>
           <Link to="/addmember" className="sidebar-link">
-             Add Member
+            Add Member
           </Link>
           <Link to="/managebooks" className="sidebar-link">
-             Manage Books
+            Manage Books
           </Link>
           <Link to="/issuebooks" className="sidebar-link">
-           Issue Books
+            Issue Books
           </Link>
           <Link to="/returnbooks" className="sidebar-link">
             Return Books
@@ -62,7 +59,7 @@ function NavbarSidebar({
           </Link>
           {(userRole === "super_admin" || email === "admin@gmail.com") && (
             <Link to="/signup" className="sidebar-link">
-               Add User
+              Add User
             </Link>
           )}
         </div>

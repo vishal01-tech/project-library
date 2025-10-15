@@ -1,17 +1,23 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Form, HTTPException
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.schemas.borrowed_books import BorrowedCreate, ReturnBook
 from app.crud.borrowed_books import issue_book, return_book, get_borrowed_books
 from app.utils.auth import get_current_user_with_role
-from app.responses import success_response
+from app.utils.responses import success_response
+from app.models.members import Members
 
 
 router = APIRouter()
 
 # POST issue book
 @router.post("/issuebook")
-def issue_book_route(borrowed: BorrowedCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
+def issue_book_route(member_phone: str = Form(...), book_id: int = Form(...), db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
+    # Find member by phone
+    member = db.query(Members).filter(Members.phone == member_phone).first()
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    borrowed = BorrowedCreate(member_id=member.id, book_id=book_id)
     new_borrowed = issue_book(db, borrowed)
     return success_response({"message": "Book issued successfully"})
 

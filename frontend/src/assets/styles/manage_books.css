@@ -21,15 +21,6 @@ body {
     margin-left: -200px;
 }
 
-/* .manage-img {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.manage-img img {
-    height: 200px;
-    border-radius: 10px;
-} */
 
 .add-books {
     /* background-color: white; */
@@ -176,6 +167,18 @@ select {
     height: 80px;
     object-fit: cover;
     border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.book-thumb.no-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    color: #888;
+    font-size: 0.8rem;
+    text-align: center;
+    border: 1px solid #ddd;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 

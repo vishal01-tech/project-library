@@ -2,6 +2,7 @@ import os
 import random
 import string
 import smtplib
+from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from app.models.users import Users
 from app.schemas.users import UserCreate, ForgotPasswordRequest, ResetPasswordRequest
@@ -13,6 +14,13 @@ from email.mime.multipart import MIMEMultipart
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+
+# Load environment variables from .env file
+load_dotenv()
+
+
 
 def get_user_by_email(db: Session, email: str):
     return db.query(Users).filter(Users.email == email).first()
@@ -67,6 +75,9 @@ def send_email(to_email: str, otp: str):
     smtp_port = int(os.getenv("SMTP_PORT", 587))
     smtp_username = os.getenv("SMTP_USERNAME")
     smtp_password = os.getenv("SMTP_PASSWORD")
+    print("-"*50)
+    print(smtp_server)
+    print(smtp_username)
 
     if not smtp_username or not smtp_password:
         raise HTTPException(status_code=500, detail="SMTP credentials not configured")

@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import NavbarSidebar from "../components/NavbarSidebar";
 import "../assets/styles/MemberList.css";
-
 import api from "../api/api";
 
 function MemberList() {
   const [members, setMembers] = useState([]);
   const [borrowed, setBorrowed] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterMembers, setfilterMembers] = useState([]);
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -41,6 +42,19 @@ function MemberList() {
   };
 
   useEffect(() => {
+    // filter members by name
+    if (searchQuery.trim() === "") {
+      setfilterMembers(members);
+    } else {
+      const filtered = members.filter(
+        (member) =>
+          member.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setfilterMembers(filtered);
+    }
+  }, [members,searchQuery])
+
+  useEffect(() => {
     const fetchData = async () => {
       await Promise.all([fetchMembers(), fetchBorrowed(), fetchBooks()]);
       setLoading(false);
@@ -60,7 +74,7 @@ function MemberList() {
     }
   });
 
-  const membersWithBorrowed = members.filter((member) => memberBorrowedMap[member.id]);
+  const membersWithBorrowed = filterMembers.filter((member) => memberBorrowedMap[member.id]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -70,46 +84,52 @@ function MemberList() {
     <>
       <NavbarSidebar />
       <div className="main">
-        {/* <h3>Members with Borrowed Books</h3> */}
-        {membersWithBorrowed.length === 0 ? (
-          <p>No members have borrowed books.</p>
-        ) : (
-          membersWithBorrowed.map((member) => (
-            <div
-              className="container"
-              key={member.id}
-              style={{
-                marginBottom: "20px",
-                border: "1px solid #ccc",
-                padding: "10px",
-              }}
-            >
-              <p>
-                <span>Name: </span> {member.name}
-              </p>
-              <p>
-                <span>Email: </span> {member.email}
-              </p>
-              <p>
-                <span>Phone: </span> {member.phone}
-              </p>
-              <p>
-                <span>Address: </span> {member.address}
-              </p>
-              <h5>
-                <span>Borrowed Books:</span>
-              </h5>
-              <ul>
-                {memberBorrowedMap[member.id].map((b) => (
-                  <li key={b.id}>
-                    {b.book.title} by {b.book.author} (Borrowed at:{" "}
-                    {new Date(b.borrowed_at).toLocaleDateString()})
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
-        )}
+        <div className="member-list">
+          <h3>Members with Borrowed Books</h3>
+          <input
+            type="text"
+            placeholder="Search member by name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-bar"
+          />
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Borrowed Books</th>
+              </tr>
+            </thead>
+            <tbody>
+              {membersWithBorrowed.length == 0 ? (
+                <tr>
+                  <td colSpan="4">No members have borrowed books</td>
+                </tr>
+              ) : (
+                membersWithBorrowed.map((member) => (
+                  <tr key={member.id}>
+                    <td>{member.name}</td>
+                    <td>{member.email}</td>
+                    <td>{member.phone}</td>
+                    <td>{member.address}</td>
+                    <td>
+                      {memberBorrowedMap[member.id].map((borrow) => (
+                        <tr key={borrow.id}>
+                          <li>
+                            {borrow.book.title} by {borrow.book.author}
+                          </li>
+                        </tr>
+                      ))}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );

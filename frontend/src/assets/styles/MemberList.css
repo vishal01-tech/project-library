@@ -23,6 +23,20 @@ body {
   gap: 30px;
 
 }
+.member-list{
+  margin-left: 150px;
+  width: 140%;
+  .search-bar{
+    height: 40px;
+    width: 200px;
+    text-align: center;
+    margin-left: 80%;
+    margin-top: -40px;
+  }
+}
+.member-list h3{
+  margin-top: -20px;
+}
 
 ul {
     list-style-type: decimal;

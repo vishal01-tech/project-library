@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from jose import jwt, JWTError
 from fastapi import Request, HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.database.database import SessionLocal
 from app.models import Users
@@ -40,11 +41,15 @@ def get_current_user(request: Request):
     return verify_access_token(token)
 
 
+# OAuth2 scheme for Swagger
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
 # Dependency to get current user with role check
 def get_current_user_with_role(required_role: str = None):
-    def dependency(request: Request, db: Session = Depends(lambda: SessionLocal())):
-        token = request.cookies.get("access_token")
+    def dependency(token: str = Depends(oauth2_scheme), db: Session = Depends(lambda: SessionLocal())):
         payload = verify_access_token(token)
+        if not payload:
+            raise HTTPException(status_code=401, detail="Invalid token")
         user = db.query(Users).filter(Users.email == payload.get("sub")).first()
         if not user:
             raise HTTPException(status_code=401, detail="User not found")
