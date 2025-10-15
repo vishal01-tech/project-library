@@ -3,12 +3,12 @@ from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.schemas.borrowed_books import BorrowedCreate, ReturnBook
 from app.crud.borrowed_books import issue_book, return_book, get_borrowed_books
-from app.utils.auth import get_current_user_with_role
+from app.utils.auth import get_current_user_with_role, oauth2_scheme
 from app.utils.responses import success_response
 from app.models.members import Members
 
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(oauth2_scheme)])
 
 # POST issue book
 @router.post("/issuebook")

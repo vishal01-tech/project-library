@@ -2,7 +2,6 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.security import OAuth2PasswordBearer
 from app.routes.users import router as users_router
 from app.routes.members import router as members_router
 from app.routes.books import router as books_router
@@ -13,9 +12,7 @@ from app.routes.borrowed_books import router as borrowed_books_router
 # Ensure uploads directory exists
 os.makedirs("app/media", exist_ok=True)
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-
-app = FastAPI(security=[oauth2_scheme])
+app = FastAPI()
 
 # Mount static files for uploaded images
 app.mount("/media", StaticFiles(directory="app/media"), name="media")

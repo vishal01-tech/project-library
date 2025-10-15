@@ -9,7 +9,7 @@ from app.utils.auth import get_current_user_with_role, oauth2_scheme
 import shutil
 
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(oauth2_scheme)])
 
 # POST add books
 @router.post("/addbooks")

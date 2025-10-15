@@ -3,12 +3,12 @@ from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.schemas.members import MemberCreate
 from app.crud.members import create_member, get_members
-from app.utils.auth import get_current_user_with_role
+from app.utils.auth import get_current_user_with_role, oauth2_scheme
 from app.utils.responses import success_response
 
 
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(oauth2_scheme)])
 
 # POST add member
 @router.post("/addmember")
