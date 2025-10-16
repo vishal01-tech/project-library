@@ -1,32 +1,42 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import "../assets/styles/return_books.css";
-
 import api from "../api/api";
 import NavbarSidebar from "../components/NavbarSidebar";
-import Cookies from "js-cookie";
 
-const ReturnBooks = () => {
+function ReturnBooks() {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [members, setMembers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterMembers, setfilterMembers] = useState([]);
   const [books, setBooks] = useState([]);
   const [userRole, setUserRole] = useState("user");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const fetchBorrowedBooks = async (page = 1, search = searchQuery) => {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: "10",
+      });
+      if (search) {
+        params.append("search", search);
+      }
+      const response = await api.get(`/borrowed?${params.toString()}`);
+      const data = response.data;
+      setBorrowedBooks(data.data);
+      setTotalPages(Math.ceil(data.total / 10));
+      setCurrentPage(page);
+    } catch (error) {
+      console.error("Failed to fetch borrowed books:", error);
+    }
+  };
 
   useEffect(() => {
     api
-      .get("/borrowed")
-      .then((res) => {
-        setBorrowedBooks(res.data);
-      })
-      .catch((err) => console.error("Failed to fetch borrowed books", err));
-
-    api
       .get("/members")
       .then((res) => {
-        setMembers(res.data);
+        setMembers(res.data.data);
       })
       .catch((err) => console.error("Failed to fetch members", err));
 
@@ -43,41 +53,24 @@ const ReturnBooks = () => {
     setUserRole(role);
   }, []);
 
-  const handleLogout = () => {
-    Cookies.remove("access_token");
-    Cookies.remove("email");
-    toast.success("Logged out successfully!");
-  };
+  useEffect(() => {
+    // Refetch borrowed books when search query changes
+    fetchBorrowedBooks(1, searchQuery);
+  }, [searchQuery]);
 
   const getMemberName = (memberId) => {
     const member = members.find((m) => m.id === memberId);
     return member?.name || "Unknown Member";
   };
   const getMemberEmail = (memberId) => {
-    const member = members.find((m) => m.id === memberId)
-    return member?.email || "Email not found"
+    const member = members.find((m) => m.id === memberId);
+    return member?.email || "Email not found";
   };
 
   const getBookTitle = (bookId) => {
     const book = books.find((b) => b.id === bookId);
     return book?.title || "Unknown Book";
   };
-
-   useEffect(() => {
-     // filter members by name
-     if (searchQuery.trim() === "") {
-       setfilterMembers(members);
-     } else {
-       const filtered = members.filter((member) =>
-         member.name.toLowerCase().includes(searchQuery.toLowerCase())
-       );
-       setfilterMembers(filtered);
-     }
-   }, [members, searchQuery]);
-  
-  const filteredBorrowedBooks = borrowedBooks.filter((borrow) =>
-    filterMembers.some((member) => member.id === borrow.member_id)
-  );
 
   const handleReturn = async (borrowedId) => {
     try {
@@ -101,7 +94,7 @@ const ReturnBooks = () => {
         toast.error(errorMessage);
       }
     } catch (error) {
-      toast.error("Error Please try again.");
+      toast.error("Please try again.");
       console.error(error);
     }
   };
@@ -109,7 +102,7 @@ const ReturnBooks = () => {
   return (
     <>
       <div className="home">
-        <NavbarSidebar handleLogout={handleLogout} />
+        <NavbarSidebar userRole={userRole} />
         <div className="main-content">
           <div className="return-books">
             <div className="return-books-list">
@@ -132,12 +125,12 @@ const ReturnBooks = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredBorrowedBooks.length === 0 ? (
+                  {borrowedBooks.length === 0 ? (
                     <tr>
-                      <td colSpan="4">No books are currently borrowed</td>
+                      <td colSpan="5">No books are currently borrowed</td>
                     </tr>
                   ) : (
-                    filteredBorrowedBooks.map((borrowed) => (
+                    borrowedBooks.map((borrowed) => (
                       <tr key={borrowed.id}>
                         <td>{getMemberName(borrowed.member_id)}</td>
                         <td>{getMemberEmail(borrowed.member_id)}</td>
@@ -158,12 +151,31 @@ const ReturnBooks = () => {
                   )}
                 </tbody>
               </table>
+              {totalPages > 1 && (
+                <div className="pagination">
+                  <button
+                    onClick={() => fetchBorrowedBooks(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+                  <span>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => fetchBorrowedBooks(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
     </>
   );
-};
+}
 
 export default ReturnBooks;

@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, Body
+from fastapi import APIRouter, Depends, Request, Body
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.schemas.users import UserLogin, UserCreate, TokenResponse, ForgotPasswordRequest, ResetPasswordRequest
 from app.crud.users import authenticate_user, create_user, users_exist, forgot_password, reset_password
-from app.utils.auth import create_access_token, verify_access_token, oauth2_scheme
+from app.utils.auth import create_access_token, verify_access_token
 from app.utils.responses import success_response, error_response
 from datetime import timedelta, datetime
 from app.models.users import Users
@@ -20,7 +20,7 @@ def login(user_login: UserLogin, db: Session = Depends(get_db)):
     token_data = {"sub": user.email}
     access_token = create_access_token(data=token_data, time_delta=timedelta(hours=3))
 
-    return success_response(data={"access_token": access_token, "token_type": "bearer", "email": user.email, "username": user.username, "role": user.role})
+    return success_response(data={"access_token": access_token, "token_type": "bearer", "email": user.email, "role": user.role})
 
 # Signup API
 @router.post("/signup")

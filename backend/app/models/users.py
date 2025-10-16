@@ -7,10 +7,9 @@ class Users(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     fullname = Column(String(100), nullable=False)
-    username = Column(String(100), nullable=False)
     email = Column(String(100),nullable=False)
     password = Column(String(255),nullable=False)
-    role = Column(String(50), nullable=False, default='user')  # 'user' or 'super_admin'
+    role = Column(String(50), nullable=False, default='user')
     otp = Column(String(6), nullable=True)
     otp_expiry = Column(TIMESTAMP, nullable=True)
     created_at = Column(TIMESTAMP,default=func.now())

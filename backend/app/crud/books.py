@@ -20,10 +20,16 @@ def create_book(db: Session, book: BookCreate, image_path: str = None):
     db.refresh(new_book)
     return new_book
 
-def get_books(db: Session, page: int = 1, limit: int = 12):
+def get_books(db: Session, page: int = 1, limit: int = 12, search: str = None):
+    query = db.query(Books)
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            (Books.title.ilike(search_term)) | (Books.author.ilike(search_term))
+        )
+    total = query.count()
     offset = (page - 1) * limit
-    books = db.query(Books).offset(offset).limit(limit).all()
-    total = db.query(Books).count()
+    books = query.offset(offset).limit(limit).all()
     return {"data": books, "total": total, "page": page, "limit": limit}
 
 def get_book_by_id(db: Session, book_id: int):

@@ -10,12 +10,23 @@ function MemberList() {
   const [filterMembers, setfilterMembers] = useState([]);
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchMembers = async () => {
+  const fetchMembers = async (page = 1, search = searchQuery) => {
     try {
-      const response = await api.get("/members");
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '10'
+      });
+      if (search) {
+        params.append('search', search);
+      }
+      const response = await api.get(`/members?${params.toString()}`);
       const data = response.data;
-      setMembers(data);
+      setMembers(data.data);
+      setTotalPages(Math.ceil(data.total / 10));
+      setCurrentPage(page);
     } catch (error) {
       console.error("Failed to fetch members:", error);
     }
@@ -25,7 +36,7 @@ function MemberList() {
     try {
       const response = await api.get("/borrowed");
       const data = response.data;
-      setBorrowed(data);
+      setBorrowed(data.data || []);
     } catch (error) {
       console.error("Failed to fetch borrowed books:", error);
     }
@@ -42,21 +53,13 @@ function MemberList() {
   };
 
   useEffect(() => {
-    // filter members by name
-    if (searchQuery.trim() === "") {
-      setfilterMembers(members);
-    } else {
-      const filtered = members.filter(
-        (member) =>
-          member.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setfilterMembers(filtered);
-    }
-  }, [members,searchQuery])
+    // Refetch members when search query changes
+    fetchMembers(1, searchQuery);
+  }, [searchQuery]);
 
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([fetchMembers(), fetchBorrowed(), fetchBooks()]);
+      await Promise.all([fetchBorrowed(), fetchBooks()]);
       setLoading(false);
     };
     fetchData();
@@ -74,7 +77,7 @@ function MemberList() {
     }
   });
 
-  const membersWithBorrowed = filterMembers.filter((member) => memberBorrowedMap[member.id]);
+  const membersWithBorrowed = members.filter((member) => memberBorrowedMap[member.id]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -106,7 +109,7 @@ function MemberList() {
             <tbody>
               {membersWithBorrowed.length == 0 ? (
                 <tr>
-                  <td colSpan="4">No members have borrowed books</td>
+                  <td colSpan="5">No members have borrowed books</td>
                 </tr>
               ) : (
                 membersWithBorrowed.map((member) => (
@@ -116,19 +119,38 @@ function MemberList() {
                     <td>{member.phone}</td>
                     <td>{member.address}</td>
                     <td>
-                      {memberBorrowedMap[member.id].map((borrow) => (
-                        <tr key={borrow.id}>
-                          <li>
+                      <ul>
+                        {memberBorrowedMap[member.id].map((borrow) => (
+                          <li key={borrow.id}>
                             {borrow.book.title} by {borrow.book.author}
                           </li>
-                        </tr>
-                      ))}
+                        ))}
+                      </ul>
                     </td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                onClick={() => fetchMembers(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => fetchMembers(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </>

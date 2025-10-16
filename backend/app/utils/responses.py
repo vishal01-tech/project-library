@@ -29,8 +29,3 @@ def error_response(message: str = "Something went wrong", status_code: int = 400
         content=content
     )
 
-def not_found_response(message: str = "Resource not found"):
-    """
-    Response for 404 errors
-    """
-    return error_response(message=message, status_code=404)

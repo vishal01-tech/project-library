@@ -15,7 +15,7 @@ class TokenResponse(BaseModel):
 
 class UserCreate(BaseModel):
     fullname: str
-    username: str
+    # username: str
     email: EmailStr
     password: str
     role: str = "user" 

@@ -4,6 +4,7 @@ import string
 import smtplib
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.models.users import Users
 from app.schemas.users import UserCreate, ForgotPasswordRequest, ResetPasswordRequest
 from passlib.context import CryptContext
@@ -23,7 +24,7 @@ load_dotenv()
 
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(Users).filter(Users.email == email).first()
+    return db.query(Users).filter(func.lower(Users.email) == email.lower()).first()
 
 def verify_password(plain: str, hashed: str):
     return pwd_context.verify(plain, hashed)
@@ -52,8 +53,8 @@ def create_user(db: Session, user: UserCreate):
     # Create new user
     new_user = Users(
         fullname=user.fullname,
-        username=user.username,
-        email=user.email,
+        # username=user.username,
+        email=user.email.lower(),
         password=hashed_password,
         role=user.role
     )

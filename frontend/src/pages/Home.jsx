@@ -20,7 +20,6 @@ function Home() {
 
   useEffect(() => {
     // Get user role from cookie
-    // const role = localStorage.getItem("userRole") || "user";
     const role = Cookies.get("email") || "user";
     setUserRole(role);
 
@@ -29,23 +28,23 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    // Filter books based on search query
-    if (searchQuery.trim() === "") {
-      setFilteredBooks(books);
-    } else {
-      const filtered = books.filter(
-        (book) => book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          book.author.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredBooks(filtered);
-    }
-  }, [books, searchQuery]);
+    // Refetch books when search query changes
+    fetchBooks(1, searchQuery);
+  }, [searchQuery]);
 
-  const fetchBooks = async (page = 1) => {
+  const fetchBooks = async (page = 1, search = searchQuery) => {
     try {
-      const response = await api.get(`/books?page=${page}&limit=12`);
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '12'
+      });
+      if (search) {
+        params.append('search', search);
+      }
+      const response = await api.get(`/books?${params.toString()}`);
       const data = response.data;
       setBooks(data.data);
+      setFilteredBooks(data.data);
       setTotalBooks(data.total);
       setTotalPages(Math.ceil(data.total / 12));
       setCurrentPage(page);
@@ -89,20 +88,17 @@ function Home() {
             placeholder="Search books by title or author..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-bar" />
+            className="search-bar"
+          />
         </div>
         <div className="books-grid">
           {filteredBooks.map((book) => (
             <div key={book.id} className="book-card">
               <div className="book-image">
                 {book.image ? (
-                  <img
-                    src={`${baseURL}${book.image}`}
-                    alt={book.title} />
+                  <img src={`${baseURL}${book.image}`} alt={book.title} />
                 ) : (
-                  <div className="no-image">
-                    Image not available
-                  </div>
+                  <div className="no-image">Image not available</div>
                 )}
               </div>
               <div className="book-info">
@@ -116,13 +112,13 @@ function Home() {
                   className="action-btn update-btn"
                   onClick={() => navigate(`/manage-books/${book.id}`)}
                 >
-                  Update
+                  ✏️ Update
                 </button>
                 <button
                   className="action-btn delete-btn"
                   onClick={() => handleDeleteBook(book.id)}
                 >
-                  Delete
+                  🗑️ Delete
                 </button>
               </div>
             </div>

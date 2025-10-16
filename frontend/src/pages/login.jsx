@@ -23,7 +23,6 @@ function Login() {
         break;
       case "password":
         if (!value.trim()) return "Password is required.";
-        if (value.length < 6) return "Password must be at least 6 characters.";
         break;
       default:
         return "";
@@ -94,7 +93,7 @@ function Login() {
       if (error.response && error.response.status === 401) {
         toast.error("Invalid email or password");
       } else {
-        toast.error("An error occurred during login. Please try again.");
+        toast.error("Please try again");
       }
     } finally {
       setIsLoading(false);

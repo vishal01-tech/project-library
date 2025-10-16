@@ -217,7 +217,6 @@ function ManageBooks() {
           toast.error("Failed to delete book");
         }
       } catch (error) {
-        console.error("Failed to delete book:", error);
         toast.error("Failed to delete book");
       }
     }
@@ -343,7 +342,7 @@ function ManageBooks() {
               </div>
               <div className="form-buttons">
                 <button type="submit" className="button">
-                  {editingBook ? "UPDATE" : "ADD"}
+                  {editingBook ? "UPDATE" : "Add Book"}
                 </button>
               </div>
             </form>

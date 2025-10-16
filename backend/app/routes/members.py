@@ -14,10 +14,10 @@ router = APIRouter(dependencies=[Depends(oauth2_scheme)])
 @router.post("/addmember")
 def add_member(member: MemberCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
     new_member = create_member(db, member)
-    return success_response({"message": "Member added successfully"})
+    return success_response(data = None , message="Member added successfully")
+
 
 # GET members
 @router.get("/members")
-def get_members_route(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
-    members = get_members(db)
-    return members
+def get_members_route(page: int = 1, limit: int = 10, search: str = None, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
+    return get_members(db, page, limit, search)

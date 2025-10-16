@@ -12,10 +12,12 @@
   align-items: flex-start;
   flex-wrap: wrap;
   color: #000;
+  background-color: #2c3e50;
   padding: 40px 20px;
   margin-top: 100px;
+  height: 260px;
   width: 90%;
-  margin-left: 200px;
+  margin-left: 160px;
 }
 
 .first {
@@ -25,13 +27,14 @@
 
 .first h2 {
   font-size: 1rem;
-  color: black;
+  color: white;
   margin-bottom: 8px;
   margin-right: 70px;
 }
 
 .first p {
-  color: #333;
+  /* color: #333; */
+  color: white;
   line-height: 1.5;
   font-size: 15px;
 }
@@ -45,14 +48,15 @@
 
 .second h2 {
   font-size: 1.2rem;
-  color: black;
+  /* color: black; */
+  color: white;
   margin-bottom: 8px;
   margin-right: 80px;
 }
 
 .second a {
   text-decoration: none;
-  color: black;
+  color: white;
   margin-bottom: 6px;
   transition: 0.3s;
 }
@@ -66,14 +70,18 @@
 
 .third h2 {
   font-size: 1.2rem;
-  color: black;
+  color: white;
+
+  /* color: black; */
   margin-bottom: 8px;
   margin-right: 110px;
 }
 
 .third a {
   text-decoration: none;
-  color: black;
+  color: white;
+
+  /* color: black; */
   margin-bottom: 6px;
   transition: 0.3s;
 }
@@ -88,7 +96,9 @@
 
 .fourth h2{
   font-size: 1.1rem;
-  color: black;
+  color: white;
+
+  /* color: black; */
   margin-bottom: 8px;
 }
 
@@ -115,7 +125,9 @@
 
 .fifth h2 {
   font-size: 0.9rem;
-  color: black;
+  /* color: black; */
+  color: white;
+
 }
 
 @media (max-width: 1024px) {

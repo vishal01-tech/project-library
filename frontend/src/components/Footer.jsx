@@ -39,7 +39,7 @@ const Footer = () => {
                 width="35"
                 height="35"
                 fill="currentColor"
-                class="bi bi-instagram"
+                className="bi bi-instagram"
                 viewBox="0 0 16 16"
               >
                 <path

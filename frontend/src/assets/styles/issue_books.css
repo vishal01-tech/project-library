@@ -16,7 +16,7 @@ body {
 
 
 .issue-books-form {
-    width: 350px;
+    width: 450px;
     padding: 30px;
     border-radius: 12px;
     display: flex;
@@ -24,7 +24,9 @@ body {
     justify-content: center;
     margin-top: 100px;
     height: 400px;
-    margin-left: 400px;
+    margin-left: 350px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
 }
 
 h3 {

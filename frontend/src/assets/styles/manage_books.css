@@ -17,13 +17,12 @@ body {
     padding: 20px;
     min-height: 80vh;
     min-width: 100%;
-    margin-top: -50px;
+    margin-top: 5px;
     margin-left: -200px;
 }
 
 
 .add-books {
-    /* background-color: white; */
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);

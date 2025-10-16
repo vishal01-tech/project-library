@@ -19,7 +19,7 @@ def issue_book_route(member_phone: str = Form(...), book_id: int = Form(...), db
         raise HTTPException(status_code=404, detail="Member not found")
     borrowed = BorrowedCreate(member_id=member.id, book_id=book_id)
     new_borrowed = issue_book(db, borrowed)
-    return success_response({"message": "Book issued successfully"})
+    return success_response(data=None , message="Book added successfully")
 
 
 # POST return book
@@ -30,6 +30,5 @@ def return_book_route(return_data: ReturnBook, db: Session = Depends(get_db), cu
 
 # GET borrowed books
 @router.get("/borrowed")
-def get_borrowed_books_route(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
-    borrowed = get_borrowed_books(db)
-    return borrowed
+def get_borrowed_books_route(page: int = 1, limit: int = 10, search: str = None, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
+    return get_borrowed_books(db, page, limit, search)

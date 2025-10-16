@@ -57,5 +57,13 @@ def return_book(db: Session, return_data: ReturnBook):
     db.commit()
     return {"message": "Book returned successfully"}
 
-def get_borrowed_books(db: Session):
-    return db.query(Borrowed).filter(Borrowed.returned_at.is_(None)).all()
+def get_borrowed_books(db: Session, page: int = 1, limit: int = 10, search: str = None):
+    from app.models.members import Members
+    query = db.query(Borrowed).join(Members, Borrowed.member_id == Members.id).filter(Borrowed.returned_at.is_(None))
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(Members.name.ilike(search_term))
+    total = query.count()
+    offset = (page - 1) * limit
+    borrowed = query.offset(offset).limit(limit).all()
+    return {"data": borrowed, "total": total, "page": page, "limit": limit}

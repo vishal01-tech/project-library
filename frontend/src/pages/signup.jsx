@@ -5,10 +5,9 @@ import "../assets/styles/signup.css";
 import api from "../api/api";
 import NavbarSidebar from "../components/NavbarSidebar";
 
-const SignUp = () => {
+function SignUp() {
   const [formData, setFormData] = useState({
     fullname: "",
-    // username: "",
     email: "",
     password: "",
     role: "user",
@@ -22,7 +21,7 @@ const SignUp = () => {
     const checkUsersExist = async () => {
       try {
         const response = await api.get("/users/exists");
-        const result = await response.json();
+        const result = response.data;
         setUsersExist(result.exists);
       } catch (err) {
         console.error("Error checking if users exist:", err);
@@ -58,7 +57,7 @@ const SignUp = () => {
   };
 
   const validateForm = () => {
-    const fieldNames = ["fullname","email", "password"];
+    const fieldNames = ["fullname", "email", "password"];
     const newErrors = {};
 
     fieldNames.forEach((field) => {
@@ -112,7 +111,7 @@ const SignUp = () => {
         toast.error(response.data.detail || "Signup failed.");
       }
     } catch (err) {
-      toast.error("Network error. Please try again.");
+      toast.error("Please try again.");
       console.error(err);
     }
   };
@@ -134,13 +133,12 @@ const SignUp = () => {
                 value={formData.fullname}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Enter your fullname"
-              />
+                placeholder="Enter your fullname" />
               {errors.fullname && (
                 <span className="error">{errors.fullname}</span>
               )}
             </div>
-{/* 
+            {/*
             <div className="form-group">
               <label>
                 Username <span>*</span>
@@ -168,8 +166,7 @@ const SignUp = () => {
                 value={formData.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Enter your email"
-              />
+                placeholder="Enter your email" />
               {errors.email && <span className="error">{errors.email}</span>}
             </div>
 
@@ -183,8 +180,7 @@ const SignUp = () => {
                 value={formData.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Enter your password"
-              />
+                placeholder="Enter your password" />
               {errors.password && (
                 <span className="error">{errors.password}</span>
               )}
@@ -196,20 +192,16 @@ const SignUp = () => {
               </label>
               <select name="role" value={formData.role} onChange={handleChange}>
                 <option value="user">User</option>
-                {!usersExist && (
-                  <option value="super_admin">Super Admin</option>
-                )}
               </select>
+              <button type="submit" className="button">
+                Add User
+              </button>
             </div>
-
-            <button type="submit" className="button">
-              Create Account
-            </button>
           </form>
         </div>
       </div>
     </>
   );
-};
+}
 
 export default SignUp;

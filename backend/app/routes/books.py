@@ -38,12 +38,12 @@ def add_books(
     from app.schemas.books import BookCreate
     book_data = BookCreate(title=title, author=author, quantity=quantity_int, category=category)
     new_book = create_book(db, book_data, image_path)
-    return success_response({"message": "Book added successfully"},current_user)
+    return success_response(data=None, message="Book added successfully")
 
 # GET books
 @router.get("/books")
-def get_books_route(page: int = 1, limit: int = 12, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
-    return get_books(db, page, limit)
+def get_books_route(page: int = 1, limit: int = 12, search: str = None, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
+    return get_books(db, page, limit, search)
 
 # GET single book
 @router.get("/books/{book_id}")

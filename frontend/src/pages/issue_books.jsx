@@ -22,7 +22,7 @@ function IssueBooks() {
   useEffect(() => {
     api
       .get("/members")
-      .then((response) => setMembers(response.data))
+      .then((response) => setMembers(response.data.data || []))
       .catch((err) => console.error("Failed to fetch members", err));
 
     api
@@ -79,7 +79,7 @@ function IssueBooks() {
         toast.error(result.detail || "Failed to issue book.");
       }
     } catch (error) {
-      toast.error("Network error. Please try again.");
+      toast.error("Please try again.");
       console.error(error);
     }
   };
