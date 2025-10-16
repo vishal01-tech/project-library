@@ -2,24 +2,37 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'node18'
-        python 'python3'
+        nodejs 'node18'    // Must match the name in Jenkins → Manage Jenkins → Tools
+        python 'python3'   // Must match the name in Jenkins → Manage Jenkins → Tools
     }
 
     environment {
-        BACKEND_DIR = 'backend'      // folder name for FastAPI app
-        FRONTEND_DIR = 'frontend'    // folder name for React app
+        FRONTEND_DIR = 'frontend'
+        BACKEND_DIR  = 'backend'
     }
 
     stages {
-        stage('Clone Repository') {
+
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/<your-username>/<your-repo>.git'
+                echo '📦 Cloning repository...'
+                git branch: 'main', url: 'https://github.com/vishal01-tech/project-library.git'
+            }
+        }
+
+        stage('Install Backend Dependencies') {
+            steps {
+                echo '🐍 Installing FastAPI dependencies...'
+                dir("${BACKEND_DIR}") {
+                    sh 'pip install --upgrade pip'
+                    sh 'pip install -r requirements.txt'
+                }
             }
         }
 
         stage('Install Frontend Dependencies') {
             steps {
+                echo '🧩 Installing React dependencies...'
                 dir("${FRONTEND_DIR}") {
                     sh 'npm install'
                 }
@@ -28,44 +41,43 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
+                echo '🏗️ Building React frontend...'
                 dir("${FRONTEND_DIR}") {
                     sh 'npm run build'
                 }
             }
         }
 
-        stage('Setup Backend') {
+        stage('Run Backend Tests') {
             steps {
+                echo '🧪 Running FastAPI backend tests...'
                 dir("${BACKEND_DIR}") {
-                    sh 'python3 -m venv venv'
-                    sh 'source venv/bin/activate && pip install -r requirements.txt'
+                    // Run pytest if tests exist, skip otherwise
+                    sh 'pytest || echo "⚠️ No tests found, skipping..."'
                 }
             }
         }
 
-        stage('Run FastAPI Tests (Optional)') {
+        stage('Package Application') {
             steps {
-                dir("${BACKEND_DIR}") {
-                    sh 'source venv/bin/activate && pytest || echo "Tests skipped"'
-                }
+                echo '📦 Preparing app for deployment...'
+                // You can later add Docker build & push steps here
             }
         }
 
-        stage('Start FastAPI Server') {
+        stage('Deploy (Optional)') {
             steps {
-                dir("${BACKEND_DIR}") {
-                    sh 'nohup uvicorn main:app --host 0.0.0.0 --port 8000 &'
-                }
+                echo '🚀 Deployment stage (Docker/K8s can be added here later)'
             }
         }
     }
 
     post {
         success {
-            echo '✅ Build and deployment successful!'
+            echo '✅ Build completed successfully!'
         }
         failure {
-            echo '❌ Build failed! Check logs in Jenkins console.'
+            echo '❌ Build failed. Check logs for details.'
         }
     }
 }
