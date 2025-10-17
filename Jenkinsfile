@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         nodejs 'node18'    // Must match the name in Jenkins → Manage Jenkins → Tools
-        jenkins.plugins.shiningpanda.tools.PythonInstallation 'python'  // Must match the name in Jenkins → Manage Jenkins → Tools
+        python 'python'  // Must match the name in Jenkins → Manage Jenkins → Tools
     }
 
     environment {
