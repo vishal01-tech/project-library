@@ -41,10 +41,12 @@ function NavbarSidebar({ userRole }) {
             {isDropdownOpen && (
               <div className="user-dropdown">
                 <p>Logged in as: {email}</p>
+                <Link to="/" onClick={handleLogout}>
+                  <button className="log-out">Log Out</button>
+                </Link>
               </div>
             )}
           </div>
-         
         </div>
       </nav>
 
@@ -107,11 +109,7 @@ function NavbarSidebar({ userRole }) {
             >
               ➕ Add User
             </Link>
-            
           )}
-           <Link to="/" onClick={handleLogout}>
-            <button className="log-out">Log Out</button>
-          </Link>
         </div>
       </div>
     </>

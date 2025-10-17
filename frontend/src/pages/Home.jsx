@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "../assets/styles/Home.css";
 import {useNavigate } from "react-router-dom";
 import NavbarSidebar from "../components/NavbarSidebar";
+import Pagination from "../components/Pagination";
 import api from "../api/api";
 import Cookies from "js-cookie";
 
@@ -16,6 +17,7 @@ function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalBooks, setTotalBooks] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [booksPerPage, setBooksPerPage] = useState(12);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,11 +34,16 @@ function Home() {
     fetchBooks(1, searchQuery);
   }, [searchQuery]);
 
+  useEffect(() => {
+    // Refetch books when booksPerPage changes
+    fetchBooks(1, searchQuery);
+  }, [booksPerPage]);
+
   const fetchBooks = async (page = 1, search = searchQuery) => {
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '12'
+        limit: booksPerPage.toString()
       });
       if (search) {
         params.append('search', search);
@@ -46,7 +53,7 @@ function Home() {
       setBooks(data.data);
       setFilteredBooks(data.data);
       setTotalBooks(data.total);
-      setTotalPages(Math.ceil(data.total / 12));
+      setTotalPages(Math.ceil(data.total / booksPerPage));
       setCurrentPage(page);
     } catch (error) {
       console.error("Failed to fetch books:", error);
@@ -83,13 +90,27 @@ function Home() {
       <div className="main-content">
         <div className="header-row">
           <h2>All Books</h2>
-          <input
-            type="text"
-            placeholder="Search books by title or author..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-bar"
-          />
+          <div className="search-and-dropdown">
+            <input
+              type="text"
+              placeholder="Search books by title or author..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-bar"
+            />
+            <select
+              value={booksPerPage}
+              onChange={(e) => setBooksPerPage(parseInt(e.target.value))}
+              className="books-per-page-dropdown"
+            >
+              <option value={12}>Select Books</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={30}>30</option>
+              <option value={40}>40</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
         </div>
         <div className="books-grid">
           {filteredBooks.map((book) => (
@@ -125,23 +146,11 @@ function Home() {
           ))}
         </div>
         {totalPages > 1 && (
-          <div className="pagination">
-            <button
-              onClick={() => fetchBooks(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <span>
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() => fetchBooks(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={fetchBooks}
+          />
         )}
       </div>
     </div>

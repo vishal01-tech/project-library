@@ -94,7 +94,7 @@ body {
   width: 250px;
   outline: none;
   transition: border-color 0.3s;
-  margin-right: 250px;
+  margin-left: 580px;
 }
 .search-bar input{
   background-color: white;
@@ -183,17 +183,22 @@ body {
 
 .header-row {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
   margin-bottom: 2rem;
 }
 
 .header-row h2 {
-  margin: 0;
-  margin-left: 530px;
+  margin: 0 0 1rem 0;
 }
 
-.header-row .search-bar {
+.search-and-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-and-dropdown .search-bar {
   width: 300px;
   padding: 10px 15px;
   border: 1px solid #ddd;
@@ -203,7 +208,20 @@ body {
   transition: border-color 0.3s;
 }
 
-.header-row .search-bar:focus {
+.search-and-dropdown .search-bar:focus {
+  border-color: #3498db;
+}
+
+.books-per-page-dropdown {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.books-per-page-dropdown:focus {
   border-color: #3498db;
 }
 
@@ -336,7 +354,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
   margin-top: 2rem;
   padding: 1rem;
   margin-right: 210px;
@@ -362,7 +380,13 @@ body {
   cursor: not-allowed;
 }
 
-.pagination span {
-  font-size: 1rem;
+.pagination button.active {
+  background-color: #3498db;
+  color: white;
+}
+
+.pagination .ellipsis {
+  padding: 0.5rem 0.25rem;
   color: #333;
+  font-size: 1rem;
 }

@@ -12,8 +12,8 @@ import shutil
 router = APIRouter(dependencies=[Depends(oauth2_scheme)])
 
 # POST add books
-@router.post("/addbooks")
-def add_books(
+@router.post("/books")
+def add_books_route(
     title: str = Form(...),
     author: str = Form(...),
     quantity: str = Form(...),
@@ -36,7 +36,7 @@ def add_books(
         image_path = f"/media/{image.filename}"
 
     from app.schemas.books import BookCreate
-    book_data = BookCreate(title=title, author=author, quantity=quantity_int, category=category)
+    book_data = BookCreate(title=title, author=author, quantity=quantity_int, category=category,image=image_path)
     new_book = create_book(db, book_data, image_path)
     return success_response(data=None, message="Book added successfully")
 

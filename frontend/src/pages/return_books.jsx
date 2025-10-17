@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import "../assets/styles/return_books.css";
 import api from "../api/api";
 import NavbarSidebar from "../components/NavbarSidebar";
+import Pagination from "../components/Pagination";
 
 function ReturnBooks() {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
@@ -152,23 +153,11 @@ function ReturnBooks() {
                 </tbody>
               </table>
               {totalPages > 1 && (
-                <div className="pagination">
-                  <button
-                    onClick={() => fetchBorrowedBooks(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </button>
-                  <span>
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button
-                    onClick={() => fetchBorrowedBooks(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                  </button>
-                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={fetchBorrowedBooks}
+                />
               )}
             </div>
           </div>

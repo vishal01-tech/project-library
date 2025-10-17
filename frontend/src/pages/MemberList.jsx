@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import NavbarSidebar from "../components/NavbarSidebar";
+import Pagination from "../components/Pagination";
 import "../assets/styles/MemberList.css";
 import api from "../api/api";
 
@@ -133,23 +134,11 @@ function MemberList() {
             </tbody>
           </table>
           {totalPages > 1 && (
-            <div className="pagination">
-              <button
-                onClick={() => fetchMembers(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => fetchMembers(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
-            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={fetchMembers}
+            />
           )}
         </div>
       </div>
