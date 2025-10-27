@@ -12,8 +12,8 @@ import shutil
 router = APIRouter(dependencies=[Depends(oauth2_scheme)])
 
 # POST add books
-@router.post("/books")
-def add_books_route(
+@router.post("/addbooks")
+def add_books(
     title: str = Form(...),
     author: str = Form(...),
     quantity: str = Form(...),
@@ -34,11 +34,22 @@ def add_books_route(
         with open(file_location, "wb") as file_object:
             shutil.copyfileobj(image.file, file_object)
         image_path = f"/media/{image.filename}"
+        print("📤 Received image object:", image)
+        print("📤 Received image filename:", image.filename if image else None)
+
 
     from app.schemas.books import BookCreate
-    book_data = BookCreate(title=title, author=author, quantity=quantity_int, category=category,image=image_path)
+    book_data = BookCreate(title=title, author=author, quantity=quantity_int, category=category, image=image_path)
     new_book = create_book(db, book_data, image_path)
-    return success_response(data=None, message="Book added successfully")
+    book_dict = {
+        "id": new_book.id,
+        "title": new_book.title,
+        "author": new_book.author,
+        "quantity": new_book.quantity,
+        "category": new_book.category,
+        "image": new_book.image
+    }
+    return success_response(book_dict, "Book added successfully")
 
 # GET books
 @router.get("/books")
@@ -89,7 +100,16 @@ def update_book_route(
 
     book_update = BookUpdate(**update_data)
     updated_book = update_book_crud(db, book_id, book_update, image_path)
-    return updated_book
+    updated_book_dict = {
+        "id": updated_book.id,
+        "title": updated_book.title,
+        "author": updated_book.author,
+        "quantity": updated_book.quantity,
+        "category": updated_book.category,
+        "image": updated_book.image
+    }
+    return success_response(updated_book_dict, "Book updated successfully")
+
 
 # DELETE book
 @router.delete("/books/{book_id}")

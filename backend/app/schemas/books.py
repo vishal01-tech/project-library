@@ -13,3 +13,5 @@ class BookUpdate(BaseModel):
     author: Optional[str] = None
     quantity: Optional[int] = None
     category: Optional[str] = None
+    image: Optional[str] = None
+

@@ -8,7 +8,7 @@ import Cookies from "js-cookie";
 
 function ManageBooks() {
   const baseURL = api.defaults.baseURL;
-  const [books, setBooks] = useState([]); // now storing books properly
+  const [books, setBooks] = useState([]); 
   const [editingBook, setEditingBook] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -131,13 +131,9 @@ function ManageBooks() {
 
       let response;
       if (editingBook) {
-        response = await api.put(`/books/${editingBook.id}`, form, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        response = await api.put(`/books/${editingBook.id}`, form);
       } else {
-        response = await api.post("/books/", form, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        response = await api.post("/addbooks", form);
       }
 
       if (response.status === 200 || response.status === 201) {
@@ -156,6 +152,8 @@ function ManageBooks() {
         setImagePreview(null);
         setEditingBook(null);
         fetchBooks();
+      } else {
+        toast.error("Failed to save book. Please try again.");
       }
     } catch (err) {
       console.error("Error saving book:", err);

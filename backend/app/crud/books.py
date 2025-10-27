@@ -2,8 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.books import Books
 from app.schemas.books import BookCreate, BookUpdate
 from fastapi import HTTPException
-import shutil
-import os
+
 
 def create_book(db: Session, book: BookCreate, image_path: str = None):
     # Create new book
@@ -12,12 +11,13 @@ def create_book(db: Session, book: BookCreate, image_path: str = None):
         author=book.author,
         quantity=book.quantity,
         category=book.category,
-        image=image_path
+        image=book.image or image_path
     )
 
     db.add(new_book)
     db.commit()
     db.refresh(new_book)
+    print(f"Book created with image: {new_book.image}")
     return new_book
 
 def get_books(db: Session, page: int = 1, limit: int = 12, search: str = None):
