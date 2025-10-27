@@ -8,7 +8,6 @@ from app.routes.books import router as books_router
 from app.routes.borrowed_books import router as borrowed_books_router
 
 
-
 # Ensure uploads directory exists
 os.makedirs("app/media", exist_ok=True)
 
@@ -25,8 +24,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
 
 
 app.include_router(users_router)

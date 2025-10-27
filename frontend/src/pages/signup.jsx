@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import "../assets/styles/signup.css";
 import api from "../api/api";
 import NavbarSidebar from "../components/NavbarSidebar";
+import Footer from "../components/Footer";
 
 function SignUp() {
   const [formData, setFormData] = useState({
@@ -111,7 +112,15 @@ function SignUp() {
         toast.error(response.data.detail || "Signup failed.");
       }
     } catch (err) {
-      toast.error("Please try again.");
+      if (
+        err.response &&
+        err.response.status === 400 &&
+        err.response.data.detail === "Email already registered"
+      ) {
+        toast.error("Email already registered");
+      } else {
+        toast.error("Please try again.");
+      }
       console.error(err);
     }
   };
@@ -133,7 +142,8 @@ function SignUp() {
                 value={formData.fullname}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Enter your fullname" />
+                placeholder="Enter your fullname"
+              />
               {errors.fullname && (
                 <span className="error">{errors.fullname}</span>
               )}
@@ -166,7 +176,8 @@ function SignUp() {
                 value={formData.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Enter your email" />
+                placeholder="Enter your email"
+              />
               {errors.email && <span className="error">{errors.email}</span>}
             </div>
 
@@ -180,7 +191,8 @@ function SignUp() {
                 value={formData.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Enter your password" />
+                placeholder="Enter your password"
+              />
               {errors.password && (
                 <span className="error">{errors.password}</span>
               )}
@@ -200,6 +212,7 @@ function SignUp() {
           </form>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

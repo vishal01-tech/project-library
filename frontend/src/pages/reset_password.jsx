@@ -3,9 +3,8 @@ import { Link } from "react-router-dom";
 import api from "../api/api";
 import "../assets/styles/reset_password.css";
 
-
 function ResetPassword() {
-  const [email, setEmail] = useState(localStorage.getItem('resetEmail') || "");
+  const [email, setEmail] = useState(localStorage.getItem("resetEmail") || "");
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -42,13 +41,19 @@ function ResetPassword() {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (!validatePassword(password)) {
-      setErrors("Password must be at least 8 characters with at least one letter and one number.");
+      setErrors(
+        "Password must be at least 8 characters with at least one letter and one number."
+      );
     } else if (password !== confirmPassword) {
       setErrors("Passwords do not match.");
     } else {
       setErrors("");
       try {
-        const response = await api.post("/reset-password", { email, otp, new_password: password });
+        const response = await api.post("/reset-password", {
+          email,
+          otp,
+          new_password: password,
+        });
         if (response.status === 200 || response.status === 201) {
           alert(response.data.message);
           // Redirect to login or home

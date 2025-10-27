@@ -5,20 +5,22 @@ from fastapi import HTTPException
 
 
 def create_book(db: Session, book: BookCreate, image_path: str = None):
-    # Create new book
+    final_image = image_path or book.image  # ✅ ensures a valid path is used
+
     new_book = Books(
         title=book.title,
         author=book.author,
         quantity=book.quantity,
         category=book.category,
-        image=book.image or image_path
+        image=final_image
     )
 
     db.add(new_book)
     db.commit()
     db.refresh(new_book)
-    print(f"Book created with image: {new_book.image}")
+    print(f"✅ Book created with image: {new_book.image}")
     return new_book
+
 
 def get_books(db: Session, page: int = 1, limit: int = 12, search: str = None):
     query = db.query(Books)
@@ -40,7 +42,7 @@ def update_book_crud(db: Session, book_id: int, book_update: BookUpdate, image_p
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
 
-    update_data = book_update.dict(exclude_unset=True)
+    update_data = book_update.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(book, key, value)
     if image_path:

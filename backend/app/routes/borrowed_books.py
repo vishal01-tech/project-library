@@ -24,7 +24,8 @@ def issue_book_route(member_phone: str = Form(...), book_id: int = Form(...), db
 
 # POST return book
 @router.post("/returnbook")
-def return_book_route(return_data: ReturnBook, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
+def return_book_route(book_id: int = Form(...), member_id: int = Form(...), db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
+    return_data = ReturnBook(book_id=book_id, member_id=member_id)
     return return_book(db, return_data)
 
 

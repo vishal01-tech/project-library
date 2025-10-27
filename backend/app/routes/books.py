@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
 from typing import Optional
 from sqlalchemy.orm import Session
 from app.database.database import get_db
-from app.schemas.books import BookUpdate
+from app.schemas.books import BookUpdate , BookCreate
 from app.crud.books import create_book, get_books, get_book_by_id, update_book_crud, delete_book
 from app.utils.responses import success_response
 from app.utils.auth import get_current_user_with_role, oauth2_scheme
@@ -20,36 +20,46 @@ def add_books(
     category: str = Form(...),
     image: UploadFile = File(None),
     db: Session = Depends(get_db),
-    current_user : dict = Depends(get_current_user_with_role)
+    current_user: dict = Depends(get_current_user_with_role)
 ):
     try:
         quantity_int = int(quantity)
     except ValueError:
-        raise HTTPException(status_code=400, detail="Quantity must be a valid integer")
+        raise HTTPException(status_code=400, detail="Quantity must be an integer")
 
+    # Save image if provided
     image_path = None
-    if image and isinstance(image, UploadFile):
-        # Save the uploaded file
+    if image:
+        import os, shutil
+        os.makedirs("app/media", exist_ok=True)
         file_location = f"app/media/{image.filename}"
         with open(file_location, "wb") as file_object:
             shutil.copyfileobj(image.file, file_object)
         image_path = f"/media/{image.filename}"
-        print("📤 Received image object:", image)
-        print("📤 Received image filename:", image.filename if image else None)
+        print("✅ Saved image at:", file_location)
 
+    # Create book object
+    book_data = BookCreate(
+        title=title,
+        author=author,
+        quantity=quantity_int,
+        category=category,
+        image=image_path
+    )
 
-    from app.schemas.books import BookCreate
-    book_data = BookCreate(title=title, author=author, quantity=quantity_int, category=category, image=image_path)
+    # Save to DB
     new_book = create_book(db, book_data, image_path)
-    book_dict = {
+    print("✅ Book created with image path:", new_book.image)
+
+    return success_response({
         "id": new_book.id,
         "title": new_book.title,
         "author": new_book.author,
         "quantity": new_book.quantity,
         "category": new_book.category,
         "image": new_book.image
-    }
-    return success_response(book_dict, "Book added successfully")
+    }, "Book added successfully")
+
 
 # GET books
 @router.get("/books")

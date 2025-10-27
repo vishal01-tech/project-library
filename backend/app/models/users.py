@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String , TIMESTAMP , ForeignKey
+from sqlalchemy import Column, Integer, String , TIMESTAMP
 from app.database.database import Base
 from sqlalchemy.sql import func
 
@@ -6,8 +6,8 @@ class Users(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    fullname = Column(String(100), nullable=False)
-    email = Column(String(100),nullable=False)
+    fullname = Column(String(100), nullable=False,unique=True)
+    email = Column(String(100),nullable=False,unique=True)
     password = Column(String(255),nullable=False)
     role = Column(String(50), nullable=False, default='user')
     otp = Column(String(6), nullable=True)

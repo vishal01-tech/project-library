@@ -18,4 +18,5 @@ class Borrowed(BorrowedBase):
         from_attributes = True
 
 class ReturnBook(BaseModel):
-    borrowed_id: int
+    book_id: int
+    member_id : int

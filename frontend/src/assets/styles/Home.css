@@ -16,6 +16,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  margin-right: 100px;
 }
 
 /* Navbar */
@@ -229,7 +230,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
-  margin-right: 300px;
+  margin-right: 250px;
   margin-left: 100px;
 }
 

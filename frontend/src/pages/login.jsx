@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import "../assets/styles/login.css";
 
-
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -78,11 +77,11 @@ function Login() {
         password: password,
       });
 
-
       // Set cookie for backend auth
-      Cookies.set("access_token", response.data.data.access_token, { expires: 3 / 24 }); // 3 hours
+      Cookies.set("access_token", response.data.data.access_token, {
+        expires: 3 / 24,
+      }); // 3 hours
       Cookies.set("email", response.data.data.email, { expires: 3 / 24 }); // 3 hours
-
 
       // Show a success toast
       toast.success("Login successful..");
@@ -123,7 +122,8 @@ function Login() {
               value={email}
               onChange={(e) => handleChange(e, "email")}
               onBlur={(e) => handleBlur(e, "email")}
-              required />
+              required
+            />
             {errors.email && (
               <span className="error-message">{errors.email}</span>
             )}
@@ -140,7 +140,8 @@ function Login() {
               value={password}
               onChange={(e) => handleChange(e, "password")}
               onBlur={(e) => handleBlur(e, "password")}
-              required />
+              required
+            />
             {errors.password && (
               <span className="error-message">{errors.password}</span>
             )}
@@ -166,6 +167,5 @@ function Login() {
     </>
   );
 }
-  
 
 export default Login;

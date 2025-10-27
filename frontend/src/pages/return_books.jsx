@@ -4,6 +4,7 @@ import "../assets/styles/return_books.css";
 import api from "../api/api";
 import NavbarSidebar from "../components/NavbarSidebar";
 import Pagination from "../components/Pagination";
+import Footer from "../components/Footer";
 
 function ReturnBooks() {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
@@ -163,6 +164,7 @@ function ReturnBooks() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

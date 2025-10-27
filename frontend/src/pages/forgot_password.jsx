@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/api";
-import '../assets/styles/forgot_password.css'
+import "../assets/styles/forgot_password.css";
 
 function Forgotpassword() {
   const [forgotEmail, setForgotEmail] = useState("");
@@ -19,11 +19,13 @@ function Forgotpassword() {
     } else {
       setErrors(""); // Clear errors if email is valid
       try {
-        const response = await api.post("/forgot-password", { email: forgotEmail });
+        const response = await api.post("/forgot-password", {
+          email: forgotEmail,
+        });
         if (response.status === 200 || response.status === 201) {
           alert(response.data.message);
           // Store email in localStorage for reset password page
-          localStorage.setItem('resetEmail', forgotEmail);
+          localStorage.setItem("resetEmail", forgotEmail);
           // Redirect to reset password page
           window.location.href = "/resetpassword";
         } else {
@@ -37,9 +39,9 @@ function Forgotpassword() {
 
   return (
     <>
-        <nav className="nav">
-            <h3>LibraryApp</h3>
-        </nav>
+      <nav className="nav">
+        <h3>LibraryApp</h3>
+      </nav>
       <div className="forgot-img">
         <img src="./images/image.png" alt="image not found" />
       </div>

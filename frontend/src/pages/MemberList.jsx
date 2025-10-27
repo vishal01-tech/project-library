@@ -3,6 +3,7 @@ import NavbarSidebar from "../components/NavbarSidebar";
 import Pagination from "../components/Pagination";
 import "../assets/styles/MemberList.css";
 import api from "../api/api";
+import Footer from "../components/Footer";
 
 function MemberList() {
   const [members, setMembers] = useState([]);
@@ -18,10 +19,10 @@ function MemberList() {
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '10'
+        limit: "10",
       });
       if (search) {
-        params.append('search', search);
+        params.append("search", search);
       }
       const response = await api.get(`/members?${params.toString()}`);
       const data = response.data;
@@ -78,7 +79,9 @@ function MemberList() {
     }
   });
 
-  const membersWithBorrowed = members.filter((member) => memberBorrowedMap[member.id]);
+  const membersWithBorrowed = members.filter(
+    (member) => memberBorrowedMap[member.id]
+  );
 
   if (loading) {
     return <div>Loading...</div>;
@@ -142,6 +145,7 @@ function MemberList() {
           )}
         </div>
       </div>
+      <Footer />
     </>
   );
 }

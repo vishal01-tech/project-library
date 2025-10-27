@@ -4,6 +4,7 @@ import "../assets/styles/issue_books.css";
 import NavbarSidebar from "../components/NavbarSidebar";
 import api from "../api/api";
 import Cookies from "js-cookie";
+import Footer from "../components/Footer";
 
 function IssueBooks() {
   const [members, setMembers] = useState([]);
@@ -85,105 +86,127 @@ function IssueBooks() {
   };
 
   return (
-    <div className="home">
-      <NavbarSidebar userRole={userRole} />
-      <div className="main-content">
-        <div className="issue-books">
-          <div className="issue-books-form">
-            <h3>Issue Book</h3>
-            <form onSubmit={handleSubmit} noValidate>
-              <div className="form-group">
-                <label>
-                  Search Member <span>*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Search by name or number"
-                  value={memberSearch}
-                  onChange={(e) => {
-                    setMemberSearch(e.target.value);
-                    setShowMemberDropdown(true);
-                  } }
-                  onFocus={() => setShowMemberDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowMemberDropdown(false), 200)} />
-                {showMemberDropdown && memberSearch && (
-                  <div className="dropdown-list">
-                    {members
-                      .filter(
-                        (member) => member.name.toLowerCase().includes(memberSearch.toLowerCase()) ||
-                          member.phone.toString().includes(memberSearch)
-                      )
-                      .map((member) => (
-                        <div
-                          key={member.id}
-                          className="dropdown-item"
-                          onClick={() => {
-                            setFormData({ ...formData, member_phone: member.phone });
-                            setMemberSearch(`${member.name} - ${member.phone}`);
-                            setShowMemberDropdown(false);
-                            setErrors({ ...errors, member_phone: "" });
-                          } }
-                        >
-                          {member.name} - {member.phone}
-                        </div>
-                      ))}
-                  </div>
-                )}
-                {errors.member_phone && (
-                  <span className="error">{errors.member_phone}</span>
-                )}
-              </div>
+    <>
+      <div className="home">
+        <NavbarSidebar userRole={userRole} />
+        <div className="main-content">
+          <div className="issue-books">
+            <div className="issue-books-form">
+              <h3>Issue Book</h3>
+              <form onSubmit={handleSubmit} noValidate>
+                <div className="form-group">
+                  <label>
+                    Search Member <span>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Search by name or number"
+                    value={memberSearch}
+                    onChange={(e) => {
+                      setMemberSearch(e.target.value);
+                      setShowMemberDropdown(true);
+                    }}
+                    onFocus={() => setShowMemberDropdown(true)}
+                    onBlur={() =>
+                      setTimeout(() => setShowMemberDropdown(false), 200)
+                    }
+                  />
+                  {showMemberDropdown && memberSearch && (
+                    <div className="dropdown-list">
+                      {members
+                        .filter(
+                          (member) =>
+                            member.name
+                              .toLowerCase()
+                              .includes(memberSearch.toLowerCase()) ||
+                            member.phone.toString().includes(memberSearch)
+                        )
+                        .map((member) => (
+                          <div
+                            key={member.id}
+                            className="dropdown-item"
+                            onClick={() => {
+                              setFormData({
+                                ...formData,
+                                member_phone: member.phone,
+                              });
+                              setMemberSearch(
+                                `${member.name} - ${member.phone}`
+                              );
+                              setShowMemberDropdown(false);
+                              setErrors({ ...errors, member_phone: "" });
+                            }}
+                          >
+                            {member.name} - {member.phone}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                  {errors.member_phone && (
+                    <span className="error">{errors.member_phone}</span>
+                  )}
+                </div>
 
-              <div className="form-group">
-                <label>
-                  Search Book <span>*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Search by title or author"
-                  value={bookSearch}
-                  onChange={(e) => {
-                    setBookSearch(e.target.value);
-                    setShowBookDropdown(true);
-                  } }
-                  onFocus={() => setShowBookDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowBookDropdown(false), 200)} />
-                {showBookDropdown && bookSearch && (
-                  <div className="dropdown-list">
-                    {books
-                      .filter(
-                        (book) => book.title.toLowerCase().includes(bookSearch.toLowerCase()) ||
-                          book.author.toLowerCase().includes(bookSearch.toLowerCase())
-                      )
-                      .map((book) => (
-                        <div
-                          key={book.id}
-                          className="dropdown-item"
-                          onClick={() => {
-                            setFormData({ ...formData, book_id: book.id });
-                            setBookSearch(`${book.title} by ${book.author}`);
-                            setShowBookDropdown(false);
-                            setErrors({ ...errors, book_id: "" });
-                          } }
-                        >
-                          {book.title} by {book.author}
-                        </div>
-                      ))}
-                  </div>
-                )}
-                {errors.book_id && (
-                  <span className="error">{errors.book_id}</span>
-                )}
-              </div>
+                <div className="form-group">
+                  <label>
+                    Search Book <span>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Search by title or author"
+                    value={bookSearch}
+                    onChange={(e) => {
+                      setBookSearch(e.target.value);
+                      setShowBookDropdown(true);
+                    }}
+                    onFocus={() => setShowBookDropdown(true)}
+                    onBlur={() =>
+                      setTimeout(() => setShowBookDropdown(false), 200)
+                    }
+                  />
+                  {showBookDropdown && bookSearch && (
+                    <div className="dropdown-list">
+                      {books
+                        .filter(
+                          (book) =>
+                            book.title
+                              .toLowerCase()
+                              .includes(bookSearch.toLowerCase()) ||
+                            book.author
+                              .toLowerCase()
+                              .includes(bookSearch.toLowerCase())
+                        )
+                        .map((book) => (
+                          <div
+                            key={book.id}
+                            className="dropdown-item"
+                            onClick={() => {
+                              setFormData({ ...formData, book_id: book.id });
+                              setBookSearch(`${book.title} by ${book.author}`);
+                              setShowBookDropdown(false);
+                              setErrors({ ...errors, book_id: "" });
+                            }}
+                          >
+                            {book.title} by {book.author}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                  {errors.book_id && (
+                    <span className="error">{errors.book_id}</span>
+                  )}
+                </div>
 
-              <button type="submit" className="button">
-                Issue Book
-              </button>
-            </form>
+                <button type="submit" className="button">
+                  Issue Book
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }
 

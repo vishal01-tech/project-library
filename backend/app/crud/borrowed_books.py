@@ -6,6 +6,8 @@ from app.schemas.borrowed_books import BorrowedCreate, ReturnBook
 from fastapi import HTTPException
 from datetime import datetime
 
+
+# Issue book page
 def issue_book(db: Session, borrowed: BorrowedCreate):
     # Check if member exists
     member = db.query(Members).filter(Members.id == borrowed.member_id).first()
@@ -40,13 +42,20 @@ def issue_book(db: Session, borrowed: BorrowedCreate):
 
     return new_borrowed
 
+
+
+# return book crud
 def return_book(db: Session, return_data: ReturnBook):
-    borrowed_id = return_data.borrowed_id
-    borrowed = db.query(Borrowed).filter(Borrowed.id == borrowed_id, Borrowed.returned_at.is_(None)).first()
+    borrowed = db.query(Borrowed).filter(
+        Borrowed.book_id == return_data.book_id,
+        Borrowed.member_id == return_data.member_id,
+        Borrowed.returned_at.is_(None)
+    ).first()
+
     if not borrowed:
         raise HTTPException(status_code=404, detail="Borrowed record not found or already returned")
 
-    # Update return date
+    # Mark as returned
     borrowed.returned_at = datetime.utcnow()
 
     # Increase book quantity
@@ -55,7 +64,10 @@ def return_book(db: Session, return_data: ReturnBook):
         book.quantity += 1
 
     db.commit()
+    db.refresh(borrowed)
     return {"message": "Book returned successfully"}
+
+
 
 def get_borrowed_books(db: Session, page: int = 1, limit: int = 10, search: str = None):
     from app.models.members import Members

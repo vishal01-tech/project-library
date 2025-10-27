@@ -5,10 +5,11 @@ import api from "../api/api";
 import "../assets/styles/manage_books.css";
 import NavbarSidebar from "../components/NavbarSidebar";
 import Cookies from "js-cookie";
+import Footer from "../components/Footer";
 
 function ManageBooks() {
   const baseURL = api.defaults.baseURL;
-  const [books, setBooks] = useState([]); 
+  const [books, setBooks] = useState([]);
   const [editingBook, setEditingBook] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -67,7 +68,7 @@ function ManageBooks() {
           author: data.author,
           quantity: data.quantity.toString(),
           category: data.category,
-          image: null,
+          image: data.image,
         });
         if (data.image) {
           setImagePreview(
@@ -125,7 +126,7 @@ function ManageBooks() {
       form.append("author", formData.author);
       form.append("quantity", formData.quantity);
       form.append("category", formData.category);
-      if (formData.image) {
+      if (formData.image && formData.image instanceof File) {
         form.append("image", formData.image);
       }
 
@@ -162,128 +163,133 @@ function ManageBooks() {
   };
 
   return (
-    <div className="home">
-      <NavbarSidebar userRole={userRole} handleLogout={handleLogout} />
-      <div className="main-content">
-        <div className="manage-container">
-          <div className="add-books">
-            <h3>{editingBook ? "Edit Book" : "Add Book"}</h3>
-            <form onSubmit={handleSubmit} noValidate>
-              <div className="form-group">
-                <label htmlFor="title">
-                  Title <span>*</span>
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  id="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="Enter the title"
-                />
-                {errors.title && <span className="error">{errors.title}</span>}
-              </div>
+    <>
+      <div className="home">
+        <NavbarSidebar userRole={userRole} handleLogout={handleLogout} />
+        <div className="main-content">
+          <div className="manage-container">
+            <div className="add-books">
+              <h3>{editingBook ? "Edit Book" : "Add Book"}</h3>
+              <form onSubmit={handleSubmit} noValidate>
+                <div className="form-group">
+                  <label htmlFor="title">
+                    Title <span>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    id="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder="Enter the title"
+                  />
+                  {errors.title && (
+                    <span className="error">{errors.title}</span>
+                  )}
+                </div>
 
-              <div className="form-group">
-                <label htmlFor="author">
-                  Author <span>*</span>
-                </label>
-                <input
-                  type="text"
-                  name="author"
-                  id="author"
-                  value={formData.author}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="Enter the author name"
-                />
-                {errors.author && (
-                  <span className="error">{errors.author}</span>
-                )}
-              </div>
+                <div className="form-group">
+                  <label htmlFor="author">
+                    Author <span>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="author"
+                    id="author"
+                    value={formData.author}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder="Enter the author name"
+                  />
+                  {errors.author && (
+                    <span className="error">{errors.author}</span>
+                  )}
+                </div>
 
-              <div className="form-group">
-                <label htmlFor="quantity">
-                  Quantity <span>*</span>
-                </label>
-                <input
-                  type="number"
-                  name="quantity"
-                  id="quantity"
-                  value={formData.quantity}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="Enter the quantity"
-                />
-                {errors.quantity && (
-                  <span className="error">{errors.quantity}</span>
-                )}
-              </div>
+                <div className="form-group">
+                  <label htmlFor="quantity">
+                    Quantity <span>*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="quantity"
+                    id="quantity"
+                    value={formData.quantity}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder="Enter the quantity"
+                  />
+                  {errors.quantity && (
+                    <span className="error">{errors.quantity}</span>
+                  )}
+                </div>
 
-              <div className="form-group">
-                <label htmlFor="category">
-                  Category <span>*</span>
-                </label>
-                <select
-                  name="category"
-                  id="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                >
-                  <option value="">Select from here</option>
-                  <option value="history">History</option>
-                  <option value="biography">Biography</option>
-                  <option value="drama">Drama</option>
-                  <option value="poetry">Poetry</option>
-                  <option value="thriller">Thriller</option>
-                  <option value="mystery">Mystery</option>
-                  <option value="horror">Horror</option>
-                </select>
-                {errors.category && (
-                  <span className="error">{errors.category}</span>
-                )}
-              </div>
+                <div className="form-group">
+                  <label htmlFor="category">
+                    Category <span>*</span>
+                  </label>
+                  <select
+                    name="category"
+                    id="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  >
+                    <option value="">Select from here</option>
+                    <option value="history">History</option>
+                    <option value="biography">Biography</option>
+                    <option value="drama">Drama</option>
+                    <option value="poetry">Poetry</option>
+                    <option value="thriller">Thriller</option>
+                    <option value="mystery">Mystery</option>
+                    <option value="horror">Horror</option>
+                  </select>
+                  {errors.category && (
+                    <span className="error">{errors.category}</span>
+                  )}
+                </div>
 
-              <div className="form-group">
-                <label htmlFor="image">Upload Image</label>
-                <input
-                  type="file"
-                  name="image"
-                  id="image"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      setFormData((prev) => ({ ...prev, image: file }));
-                      setImagePreview(URL.createObjectURL(file));
-                    }
-                  }}
-                />
-                {imagePreview && (
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      marginTop: "10px",
+                <div className="form-group">
+                  <label htmlFor="image">Upload Image</label>
+                  <input
+                    type="file"
+                    name="image"
+                    id="image"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setFormData((prev) => ({ ...prev, image: file }));
+                        setImagePreview(URL.createObjectURL(file));
+                      }
                     }}
                   />
-                )}
-              </div>
+                  {imagePreview && (
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        marginTop: "10px",
+                      }}
+                    />
+                  )}
+                </div>
 
-              <div className="form-buttons">
-                <button type="submit" className="button">
-                  {editingBook ? "UPDATE" : "Add Book"}
-                </button>
-              </div>
-            </form>
+                <div className="form-buttons">
+                  <button type="submit" className="button">
+                    {editingBook ? "UPDATE" : "Add Book"}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }
 

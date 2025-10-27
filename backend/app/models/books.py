@@ -6,7 +6,7 @@ class Books(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(50), nullable=False)
-    author = Column(String(50), nullable=False)
+    author = Column(String(50), nullable=False,index=True)
     quantity = Column(Integer,nullable=False)
     category = Column(String(50),nullable=False)
     image = Column(String(255), nullable=True) 
