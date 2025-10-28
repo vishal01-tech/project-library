@@ -9,12 +9,13 @@ function MemberList() {
   const [members, setMembers] = useState([]);
   const [borrowed, setBorrowed] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterMembers, setfilterMembers] = useState([]);
+  const [filterMembers, setFilterMembers] = useState([]);
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
 
+  // Fetch members
   const fetchMembers = async (page = 1, search = searchQuery) => {
     try {
       const params = new URLSearchParams({
@@ -34,9 +35,10 @@ function MemberList() {
     }
   };
 
+  // Fetch borrowed books
   const fetchBorrowed = async () => {
     try {
-      const response = await api.get("/borrowed");
+      const response = await api.get("/borrowed?limit=10000");
       const data = response.data;
       setBorrowed(data.data || []);
     } catch (error) {
@@ -44,9 +46,10 @@ function MemberList() {
     }
   };
 
+  // Fetch books
   const fetchBooks = async () => {
     try {
-      const response = await api.get("/books");
+      const response = await api.get("/books?limit=10000");
       const data = response.data;
       setBooks(data.data);
     } catch (error) {
@@ -54,18 +57,26 @@ function MemberList() {
     }
   };
 
+  // Debounced search effect
   useEffect(() => {
-    // Refetch members when search query changes
-    fetchMembers(1, searchQuery);
-  }, [searchQuery]);
+    const delayDebounce = setTimeout(() => {
+      fetchMembers(currentPage, searchQuery); // Trigger fetchMembers with currentPage and searchQuery
+    }, 500); // 500ms debounce delay
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery, currentPage]); // Triggered on searchQuery or currentPage change
 
+  // Initial data fetch (members, borrowed books, books)
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([fetchBorrowed(), fetchBooks()]);
+      await Promise.all([
+        fetchBorrowed(),
+        fetchBooks(),
+        fetchMembers(currentPage, searchQuery),
+      ]);
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, []); // Empty dependency array to run only once when component mounts
 
   // Process data to map members to their borrowed books
   const memberBorrowedMap = {};
@@ -103,6 +114,7 @@ function MemberList() {
           <table>
             <thead>
               <tr>
+                <th>S.No.</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
@@ -111,13 +123,14 @@ function MemberList() {
               </tr>
             </thead>
             <tbody>
-              {membersWithBorrowed.length == 0 ? (
+              {membersWithBorrowed.length === 0 ? (
                 <tr>
-                  <td colSpan="5">No members have borrowed books</td>
+                  <td colSpan="6">No members have borrowed books</td>
                 </tr>
               ) : (
-                membersWithBorrowed.map((member) => (
+                membersWithBorrowed.map((member, index) => (
                   <tr key={member.id}>
+                    <td>{(currentPage - 1) * 10 + (index + 1)}</td>
                     <td>{member.name}</td>
                     <td>{member.email}</td>
                     <td>{member.phone}</td>
@@ -140,7 +153,10 @@ function MemberList() {
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={fetchMembers}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                fetchMembers(page, searchQuery);
+              }}
             />
           )}
         </div>

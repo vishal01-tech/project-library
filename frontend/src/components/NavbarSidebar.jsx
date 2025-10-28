@@ -5,21 +5,22 @@ import Cookies from "js-cookie";
 import "../assets/styles/Home.css";
 
 function NavbarSidebar({ userRole }) {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const storedEmail = Cookies.get("email");
-    if (storedEmail) {
-      setEmail(storedEmail);
+    const storedUsername = Cookies.get("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
     }
   }, []);
   const handleLogout = () => {
     Cookies.remove("access_token");
     Cookies.remove("email");
+    Cookies.remove("username");
     toast.success("Logged out successfully");
     navigate("/");
   };
@@ -37,10 +38,10 @@ function NavbarSidebar({ userRole }) {
             className="user-profile"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <span className="user-icon">👤︎</span>
+            <span className="user-icon">👤︎ {username} </span>
             {isDropdownOpen && (
               <div className="user-dropdown">
-                <p>Logged in as: {email}</p>
+                {/* <p>Logged in as: </p> */}
                 <Link to="/" onClick={handleLogout}>
                   <button className="log-out">Log Out</button>
                 </Link>
@@ -100,7 +101,8 @@ function NavbarSidebar({ userRole }) {
           >
             📋 Member List
           </Link>
-          {(userRole === "super_admin" || email === "admin@gmail.com") && (
+          {(userRole === "super_admin" ||
+            Cookies.get("email") === "admin@gmail.com") && (
             <Link
               to="/signup"
               className={`sidebar-link ${

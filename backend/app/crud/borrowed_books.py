@@ -47,8 +47,7 @@ def issue_book(db: Session, borrowed: BorrowedCreate):
 # return book crud
 def return_book(db: Session, return_data: ReturnBook):
     borrowed = db.query(Borrowed).filter(
-        Borrowed.book_id == return_data.book_id,
-        Borrowed.member_id == return_data.member_id,
+        Borrowed.id == return_data.borrowed_id,
         Borrowed.returned_at.is_(None)
     ).first()
 

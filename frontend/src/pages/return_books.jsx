@@ -24,8 +24,11 @@ function ReturnBooks() {
       if (search) {
         params.append("search", search);
       }
+      console.log("Fetching borrowed books with params:", params.toString());
       const response = await api.get(`/borrowed?${params.toString()}`);
+      console.log("Response:", response);
       const data = response.data;
+      console.log("Data:", data);
       setBorrowedBooks(data.data);
       setTotalPages(Math.ceil(data.total / 10));
       setCurrentPage(page);
@@ -36,14 +39,14 @@ function ReturnBooks() {
 
   useEffect(() => {
     api
-      .get("/members")
+      .get("/members?limit=10000")
       .then((res) => {
         setMembers(res.data.data);
       })
       .catch((err) => console.error("Failed to fetch members", err));
 
     api
-      .get("/books")
+      .get("/books?limit=10000")
       .then((res) => {
         setBooks(res.data.data);
       })
@@ -56,10 +59,17 @@ function ReturnBooks() {
   }, []);
 
   useEffect(() => {
-    // Refetch borrowed books when search query changes
-    fetchBorrowedBooks(1, searchQuery);
-  }, [searchQuery]);
+    fetchBorrowedBooks();
+  }, []);
 
+   useEffect(() => {
+     const delayDebounce = setTimeout(() => {
+       fetchBorrowedBooks(1, searchQuery);
+     }, 500); // 500ms delay
+
+     // Cleanup function runs before next effect call
+     return () => clearTimeout(delayDebounce);
+   }, [searchQuery]);
   const getMemberName = (memberId) => {
     const member = members.find((m) => m.id === memberId);
     return member?.name || "Unknown Member";
@@ -119,6 +129,7 @@ function ReturnBooks() {
               <table>
                 <thead>
                   <tr>
+                    <th>S.No.</th>
                     <th>Member Name</th>
                     <th>Email</th>
                     <th>Book Title</th>
@@ -129,18 +140,19 @@ function ReturnBooks() {
                 <tbody>
                   {borrowedBooks.length === 0 ? (
                     <tr>
-                      <td colSpan="5">No books are currently borrowed</td>
+                      <td colSpan="6">No books are currently borrowed</td>
                     </tr>
                   ) : (
-                    borrowedBooks.map((borrowed) => (
+                    borrowedBooks.map((borrowed, index) => (
                       <tr key={borrowed.id}>
+                        <td>{(currentPage - 1) * 10 + (index + 1)}</td>
                         <td>{getMemberName(borrowed.member_id)}</td>
                         <td>{getMemberEmail(borrowed.member_id)}</td>
                         <td>{getBookTitle(borrowed.book_id)}</td>
                         <td>
                           {new Date(borrowed.borrowed_at).toLocaleString()}
                         </td>
-                        <td>
+                        <td>        
                           <button
                             onClick={() => handleReturn(borrowed.id)}
                             className="button"

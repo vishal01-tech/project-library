@@ -5,7 +5,7 @@ from fastapi import HTTPException
 
 
 def create_book(db: Session, book: BookCreate, image_path: str = None):
-    final_image = image_path or book.image  # ✅ ensures a valid path is used
+    final_image = image_path or book.image
 
     new_book = Books(
         title=book.title,
@@ -18,7 +18,6 @@ def create_book(db: Session, book: BookCreate, image_path: str = None):
     db.add(new_book)
     db.commit()
     db.refresh(new_book)
-    print(f"✅ Book created with image: {new_book.image}")
     return new_book
 
 

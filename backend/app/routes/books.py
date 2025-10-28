@@ -5,7 +5,7 @@ from app.database.database import get_db
 from app.schemas.books import BookUpdate , BookCreate
 from app.crud.books import create_book, get_books, get_book_by_id, update_book_crud, delete_book
 from app.utils.responses import success_response
-from app.utils.auth import get_current_user_with_role, oauth2_scheme
+from app.utils.auth import oauth2_scheme
 import shutil
 
 
@@ -20,7 +20,6 @@ def add_books(
     category: str = Form(...),
     image: UploadFile = File(None),
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user_with_role)
 ):
     try:
         quantity_int = int(quantity)
@@ -36,7 +35,7 @@ def add_books(
         with open(file_location, "wb") as file_object:
             shutil.copyfileobj(image.file, file_object)
         image_path = f"/media/{image.filename}"
-        print("✅ Saved image at:", file_location)
+        # print("Saved image at:", file_location)
 
     # Create book object
     book_data = BookCreate(
@@ -49,7 +48,6 @@ def add_books(
 
     # Save to DB
     new_book = create_book(db, book_data, image_path)
-    print("✅ Book created with image path:", new_book.image)
 
     return success_response({
         "id": new_book.id,
@@ -63,12 +61,12 @@ def add_books(
 
 # GET books
 @router.get("/books")
-def get_books_route(page: int = 1, limit: int = 12, search: str = None, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
+def get_books_route(page: int = 1, limit: int = 12, search: str = None, db: Session = Depends(get_db)):
     return get_books(db, page, limit, search)
 
 # GET single book
 @router.get("/books/{book_id}")
-def get_book(book_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
+def get_book(book_id: int, db: Session = Depends(get_db)):
     book = get_book_by_id(db, book_id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -84,7 +82,6 @@ def update_book_route(
     category: str = Form(None),
     image: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user_with_role),
 ):
     update_data = {}
     if title is not None:
@@ -123,5 +120,5 @@ def update_book_route(
 
 # DELETE book
 @router.delete("/books/{book_id}")
-def delete_book_route(book_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user_with_role)):
+def delete_book_route(book_id: int, db: Session = Depends(get_db)):
     return delete_book(db, book_id)

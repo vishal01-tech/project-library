@@ -20,23 +20,23 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-bottom: 100px;
   height: auto;
   margin-left: 50px;
+  margin-top: -20px;
   .search-bar{
     height: 40px;
     width: 200px;
     border-radius: 5px;
     text-align: center;
-    margin-left: 840px;
+    margin-left: 890px;
     margin-top: -40px;
   }
 }
 
 table {
-  width: 100%;
+  width: 105%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin-top: 10px;
   background-color: #f9f9f9;
   border-radius: 8px;
   overflow: hidden;

@@ -17,8 +17,6 @@ function Login() {
     switch (field) {
       case "email":
         if (!value.trim()) return "Email is required.";
-        // if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value))
-        //   return "Invalid email format.";
         break;
       case "password":
         if (!value.trim()) return "Password is required.";
@@ -82,6 +80,7 @@ function Login() {
         expires: 3 / 24,
       }); // 3 hours
       Cookies.set("email", response.data.data.email, { expires: 3 / 24 }); // 3 hours
+      Cookies.set("username", response.data.data.username, { expires: 3 / 24 }); // 3 hours
 
       // Show a success toast
       toast.success("Login successful..");
@@ -121,8 +120,7 @@ function Login() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => handleChange(e, "email")}
-              onBlur={(e) => handleBlur(e, "email")}
-              required
+              onBlur={(e) => handleBlur(e, "email")}  
             />
             {errors.email && (
               <span className="error-message">{errors.email}</span>
@@ -140,7 +138,6 @@ function Login() {
               value={password}
               onChange={(e) => handleChange(e, "password")}
               onBlur={(e) => handleBlur(e, "password")}
-              required
             />
             {errors.password && (
               <span className="error-message">{errors.password}</span>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/api";
 import "../assets/styles/reset_password.css";
@@ -11,9 +11,10 @@ function ResetPassword() {
   const [errors, setErrors] = useState("");
   const [step, setStep] = useState(1); // 1 for OTP verification, 2 for new password
 
-  // Validate password strength (minimum 8 characters, at least one number and one letter)
+  // Validate password strength
   const validatePassword = (password) =>
-    /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password);
+    /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(password);
+    
 
   // Handle OTP verification
   const handleOtpSubmit = async (e) => {
@@ -23,8 +24,6 @@ function ResetPassword() {
     } else {
       setErrors("");
       try {
-        // First, verify OTP by attempting reset with dummy password or separate endpoint
-        // Since backend verifies OTP in reset-password, we'll use a temporary check
         const response = await api.post("/verify-otp", { email, otp });
         if (response.status === 200) {
           setStep(2); // Move to password reset step
@@ -42,7 +41,7 @@ function ResetPassword() {
     e.preventDefault();
     if (!validatePassword(password)) {
       setErrors(
-        "Password must be at least 8 characters with at least one letter and one number."
+        "Password must be 6 character with at least one letter and number"
       );
     } else if (password !== confirmPassword) {
       setErrors("Passwords do not match.");

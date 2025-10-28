@@ -97,6 +97,7 @@ body {
   transition: border-color 0.3s;
   margin-left: 580px;
 }
+
 .search-bar input{
   background-color: white;
 }
@@ -109,10 +110,10 @@ body {
   color: white;
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: 10px;
+  border-radius: 15px;
   cursor: pointer;
   font-size: 1rem;
-  margin-top: 150px;
+  margin-top: 30px;
   margin-left: 50px;
   transition: background-color 0.3s;
 }
@@ -190,7 +191,7 @@ body {
 }
 
 .header-row h2 {
-  margin: 0 0 1rem 0;
+  margin-right: 150px;
 }
 
 .search-and-dropdown {

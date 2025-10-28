@@ -44,6 +44,7 @@ function ManageBooks() {
   const handleLogout = () => {
     Cookies.remove("access_token");
     Cookies.remove("email");
+    Cookies.remove("username")
     toast.success("Logged out successfully!");
     navigate("/login");
   };
@@ -68,7 +69,7 @@ function ManageBooks() {
           author: data.author,
           quantity: data.quantity.toString(),
           category: data.category,
-          image: data.image,
+          image: null,
         });
         if (data.image) {
           setImagePreview(

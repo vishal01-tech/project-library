@@ -20,7 +20,7 @@ def login(user_login: UserLogin, db: Session = Depends(get_db)):
     token_data = {"sub": user.email}
     access_token = create_access_token(data=token_data, time_delta=timedelta(hours=3))
 
-    return success_response(data={"access_token": access_token, "token_type": "bearer", "email": user.email, "role": user.role})
+    return success_response(data={"access_token": access_token, "token_type": "bearer", "email": user.email, "username": user.fullname, "role": user.role})
 
 # Signup API
 @router.post("/signup")
@@ -83,6 +83,6 @@ def verify_otp_route(request: dict = Body(...), db: Session = Depends(get_db)):
 def reset_password_route(request: ResetPasswordRequest, db: Session = Depends(get_db)):
     result = reset_password(db, request)
     if result.get("success"):
-        return success_response(message=result.get("message", "Password reset successful"))
+        return success_response(data= None,message=result.get("message", "Password reset successful"))
     else:
         return error_response(message=result.get("message", "Password reset failed"))

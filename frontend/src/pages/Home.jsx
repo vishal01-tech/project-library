@@ -29,8 +29,12 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    // Refetch books when search query changes
-    fetchBooks(1, searchQuery);
+    const delayDebounce = setTimeout(() => {
+      fetchBooks(1, searchQuery);
+    }, 500); // 500ms delay
+
+    // Cleanup function runs before next effect call
+    return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
   useEffect(() => {
@@ -85,8 +89,6 @@ function Home() {
     <>
       <div className="home">
         <NavbarSidebar userRole={userRole} handleLogout={handleLogout} />
-
-        {/* Main Content */}
         <div className="main-content">
           <div className="header-row">
             <h2>All Books</h2>
@@ -137,13 +139,13 @@ function Home() {
                     className="action-btn update-btn"
                     onClick={() => navigate(`/manage-books/${book.id}`)}
                   >
-                    ✏️ Update
+                    Update
                   </button>
                   <button
                     className="action-btn delete-btn"
                     onClick={() => handleDeleteBook(book.id)}
                   >
-                    🗑️ Delete
+                    Delete
                   </button>
                 </div>
               </div>
