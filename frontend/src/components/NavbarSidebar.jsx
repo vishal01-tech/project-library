@@ -7,7 +7,14 @@ import "../assets/styles/Home.css";
 function NavbarSidebar({ userRole }) {
   const [username, setUsername] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    const saved = localStorage.getItem("isSidebarOpen");
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("isSidebarOpen", JSON.stringify(isSidebarOpen));
+  }, [isSidebarOpen]);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -27,10 +34,14 @@ function NavbarSidebar({ userRole }) {
 
   return (
     <>
-      {/* Navbar */}
       <nav className="navbar">
         <div className="navbar-left">
-          <button className="sidebar-toggle">☰</button>
+          <button
+            className="sidebar-toggle"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          >
+            ☰
+          </button>
           <h1>The Chapter House</h1>
         </div>
         <div className="navbar-right">
@@ -41,7 +52,6 @@ function NavbarSidebar({ userRole }) {
             <span className="user-icon">👤︎ {username} </span>
             {isDropdownOpen && (
               <div className="user-dropdown">
-                {/* <p>Logged in as: </p> */}
                 <Link to="/" onClick={handleLogout}>
                   <button className="log-out">Log Out</button>
                 </Link>
@@ -51,7 +61,7 @@ function NavbarSidebar({ userRole }) {
         </div>
       </nav>
 
-      <div className="sidebar">
+      <div className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
         <div className="sidebar-content">
           <Link
             to="/home"
@@ -59,7 +69,7 @@ function NavbarSidebar({ userRole }) {
               location.pathname === "/home" ? "active" : ""
             }`}
           >
-            🏠 Home
+            🏠 All Books
           </Link>
           <Link
             to="/addmember"
@@ -68,14 +78,6 @@ function NavbarSidebar({ userRole }) {
             }`}
           >
             👤 Add Member
-          </Link>
-          <Link
-            to="/managebooks"
-            className={`sidebar-link ${
-              location.pathname === "/managebooks" ? "active" : ""
-            }`}
-          >
-            📚 Add Books
           </Link>
           <Link
             to="/issuebooks"
@@ -99,7 +101,7 @@ function NavbarSidebar({ userRole }) {
               location.pathname === "/memberlist" ? "active" : ""
             }`}
           >
-            📋 Member List
+            📋 Borrowed Books
           </Link>
           {(userRole === "super_admin" ||
             Cookies.get("email") === "admin@gmail.com") && (
@@ -109,7 +111,18 @@ function NavbarSidebar({ userRole }) {
                 location.pathname === "/signup" ? "active" : ""
               }`}
             >
-              ➕ Add User
+              ➕ Add Admin
+            </Link>
+          )}
+          {(userRole === "super_admin" ||
+            Cookies.get("email") === "admin@gmail.com") && (
+            <Link
+              to="/adminlist"
+              className={`sidebar-link ${
+                location.pathname === "/adminlist" ? "active" : ""
+              }`}
+            >
+              🧑‍💼 Admin List
             </Link>
           )}
         </div>

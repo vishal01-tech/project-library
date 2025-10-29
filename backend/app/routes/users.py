@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request, Body
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.schemas.users import UserLogin, UserCreate, TokenResponse, ForgotPasswordRequest, ResetPasswordRequest
-from app.crud.users import authenticate_user, create_user, users_exist, forgot_password, reset_password
+from app.crud.users import authenticate_user, create_user, users_exist, forgot_password, reset_password, get_users, update_user_role
 from app.utils.auth import create_access_token, verify_access_token
 from app.utils.responses import success_response, error_response
 from datetime import timedelta, datetime
@@ -33,7 +33,7 @@ def signup(user: UserCreate, request: Request, db: Session = Depends(get_db)):
         #     return error_response(message="First user must be super_admin", status_code=400)
     else:
         # Allow creation of 'user' role without authentication
-        if user.role == "user":
+        if user.role == "admin":
             pass
         else:
             # Subsequent users require super_admin authentication for other roles
@@ -49,7 +49,7 @@ def signup(user: UserCreate, request: Request, db: Session = Depends(get_db)):
                 return error_response(message="Insufficient permissions", status_code=403)
 
     new_user = create_user(db, user)
-    return success_response(message="User created successfully", data={"user_id": new_user.id})
+    return success_response(message="Admin created successfully", data={"user_id": new_user.id})
 
 # GET check if any users exist
 @router.get("/users/exists")
@@ -86,3 +86,41 @@ def reset_password_route(request: ResetPasswordRequest, db: Session = Depends(ge
         return success_response(data= None,message=result.get("message", "Password reset successful"))
     else:
         return error_response(message=result.get("message", "Password reset failed"))
+
+# GET all users (super_admin only)
+@router.get("/users")
+def get_users_route(request: Request, page: int = 1, limit: int = 10, search: str = "", db: Session = Depends(get_db)):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return error_response(message="Not authenticated", status_code=401)
+    token = auth_header.split(" ")[1]
+    payload = verify_access_token(token)
+    if not payload:
+        return error_response(message="Invalid token", status_code=401)
+    from app.crud.users import get_user_by_email
+    current_user = get_user_by_email(db, payload.get("sub"))
+    if not current_user or current_user.role != "super_admin":
+        return error_response(message="Insufficient permissions", status_code=403)
+    users, total = get_users(db, page=page, limit=limit, search=search)
+    return success_response(data={"users": [{"id": u.id, "fullname": u.fullname, "email": u.email, "role": u.role} for u in users], "total": total, "page": page, "limit": limit})
+
+
+# PUT update user role (super_admin only)
+@router.put("/users/{user_id}/role")
+def update_user_role_route(user_id: int, request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    if not token:
+        return error_response(message="Not authenticated", status_code=401)
+    payload = verify_access_token(token)
+    if not payload:
+        return error_response(message="Invalid token", status_code=401)
+    from app.crud.users import get_user_by_email
+    current_user = get_user_by_email(db, payload.get("sub"))
+    if not current_user or current_user.role != "super_admin":
+        return error_response(message="Insufficient permissions", status_code=403)
+    data = request.json()
+    new_role = data.get("role")
+    if not new_role:
+        return error_response(message="Role is required", status_code=400)
+    updated_user = update_user_role(db, user_id, new_role)
+    return success_response(message="User role updated successfully", data={"id": updated_user.id, "fullname": updated_user.fullname, "email": updated_user.email, "role": updated_user.role})

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import NavbarSidebar from "../components/NavbarSidebar";
 import Pagination from "../components/Pagination";
 import "../assets/styles/MemberList.css";
@@ -6,21 +7,28 @@ import api from "../api/api";
 import Footer from "../components/Footer";
 
 function MemberList() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [members, setMembers] = useState([]);
   const [borrowed, setBorrowed] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
+  const [inputValue, setInputValue] = useState(searchQuery);
   const [filterMembers, setFilterMembers] = useState([]);
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(
+    parseInt(searchParams.get("page")) || 1
+  );
   const [totalPages, setTotalPages] = useState(0);
+  const [limit, setLimit] = useState(parseInt(searchParams.get("limit")) || 10);
 
   // Fetch members
   const fetchMembers = async (page = 1, search = searchQuery) => {
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: "10",
+        limit: limit.toString(),
       });
       if (search) {
         params.append("search", search);
@@ -28,12 +36,35 @@ function MemberList() {
       const response = await api.get(`/members?${params.toString()}`);
       const data = response.data;
       setMembers(data.data);
-      setTotalPages(Math.ceil(data.total / 10));
+      setTotalPages(Math.ceil(data.total / limit));
       setCurrentPage(page);
     } catch (error) {
       console.error("Failed to fetch members:", error);
     }
   };
+
+  // Debounced search handler
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      setSearchQuery(value);
+      setCurrentPage(1);
+      setSearchParams({ page: "1", limit: limit.toString(), search: value });
+    }, 500),
+    [limit, setSearchParams]
+  );
+
+  const handleSearchChange = (e) => {
+    debouncedSearch(e.target.value);
+  };
+
+  // Debounce utility function
+  function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
 
   // Fetch borrowed books
   const fetchBorrowed = async () => {
@@ -57,15 +88,20 @@ function MemberList() {
     }
   };
 
-  // Debounced search effect
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      fetchMembers(currentPage, searchQuery); // Trigger fetchMembers with currentPage and searchQuery
-    }, 500); // 500ms debounce delay
-    return () => clearTimeout(delayDebounce);
-  }, [searchQuery, currentPage]); // Triggered on searchQuery or currentPage change
+    setInputValue(searchQuery);
+  }, [searchQuery]);
 
-  // Initial data fetch (members, borrowed books, books)
+  // Update URL params when state changes
+  useEffect(() => {
+    setSearchParams({
+      page: currentPage.toString(),
+      limit: limit.toString(),
+      search: searchQuery,
+    });
+  }, [currentPage, limit, searchQuery, setSearchParams]);
+
+  // Initial data fetch
   useEffect(() => {
     const fetchData = async () => {
       await Promise.all([
@@ -76,7 +112,7 @@ function MemberList() {
       setLoading(false);
     };
     fetchData();
-  }, []); // Empty dependency array to run only once when component mounts
+  }, [searchQuery]); // Empty dependency array to run only once when component mounts
 
   // Process data to map members to their borrowed books
   const memberBorrowedMap = {};
@@ -104,13 +140,37 @@ function MemberList() {
       <div className="main">
         <div className="member-list">
           <h3>Members with Borrowed Books</h3>
-          <input
-            type="text"
-            placeholder="Search member by name"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-bar"
-          />
+          <div className="search-and-dropdown">
+            <input
+              type="text"
+              placeholder="Search member by name"
+              value={inputValue}
+              onChange={(e) => {
+                setInputValue(e.target.value);
+                handleSearchChange(e);
+              }}
+              className="search-bar"
+            />
+            <select
+              value={limit}
+              onChange={(e) => {
+                setLimit(parseInt(e.target.value));
+                setCurrentPage(1);
+                fetchMembers(1, searchQuery);
+              }}
+              className="members-per-page-dropdown"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={30}>30</option>
+              <option value={40}>40</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={150}>150</option>
+              <option value={200}>200</option>
+              <option value={300}>300</option>
+            </select>
+          </div>
           <table>
             <thead>
               <tr>
@@ -130,7 +190,7 @@ function MemberList() {
               ) : (
                 membersWithBorrowed.map((member, index) => (
                   <tr key={member.id}>
-                    <td>{(currentPage - 1) * 10 + (index + 1)}</td>
+                    <td>{(currentPage - 1) * limit + (index + 1)}</td>
                     <td>{member.name}</td>
                     <td>{member.email}</td>
                     <td>{member.phone}</td>

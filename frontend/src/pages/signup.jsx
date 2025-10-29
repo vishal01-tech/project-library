@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 import "../assets/styles/signup.css";
 import api from "../api/api";
 import NavbarSidebar from "../components/NavbarSidebar";
@@ -11,8 +12,9 @@ function SignUp() {
     fullname: "",
     email: "",
     password: "",
-    role: "user",
+    role: "admin",
   });
+  const [userEmail, setUserEmail] = useState("");
 
   const [errors, setErrors] = useState({});
   const [usersExist, setUsersExist] = useState(false);
@@ -29,6 +31,12 @@ function SignUp() {
       }
     };
     checkUsersExist();
+
+    // Get user role from cookies
+    const email = Cookies.get("email");
+    if (email) {
+      setUserEmail(email);
+    }
   }, []);
 
   const validateField = (name, value) => {
@@ -99,13 +107,13 @@ function SignUp() {
       const response = await api.post("/signup", formData);
 
       if (response.status === 200 || response.status === 201) {
-        toast.success("User created successfully!");
+        toast.success("Admin created successfully!");
         setFormData({
           fullname: "",
           // username: "",
           email: "",
           password: "",
-          role: "user",
+          role: "admin",
         });
         navigate("/");
       } else {
@@ -127,7 +135,7 @@ function SignUp() {
 
   return (
     <>
-      <NavbarSidebar />
+      <NavbarSidebar userEmail={userEmail} />
       <div className="signup-container">
         <div className="signup-form">
           <h3>Add User</h3>
@@ -203,10 +211,10 @@ function SignUp() {
                 Role <span>*</span>
               </label>
               <select name="role" value={formData.role} onChange={handleChange}>
-                <option value="user">User</option>
+                <option value="user">Admin</option>
               </select>
               <button type="submit" className="button">
-                Add User
+                Add Admin
               </button>
             </div>
           </form>

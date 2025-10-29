@@ -136,3 +136,23 @@ def reset_password(db: Session, request: ResetPasswordRequest):
     db.commit()
 
     return {"success": True, "message": "Password reset successfully"}
+
+def get_users(db: Session, page: int = 1, limit: int = 10, search: str = ""):
+    query = db.query(Users)
+    if search:
+        query = query.filter(
+            (Users.fullname.ilike(f"%{search}%")) |
+            (Users.email.ilike(f"%{search}%"))
+        )
+    total = query.count()
+    users = query.offset((page - 1) * limit).limit(limit).all()
+    return users, total
+
+def update_user_role(db: Session, user_id: int, new_role: str):
+    user = db.query(Users).filter(Users.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.role = new_role
+    db.commit()
+    db.refresh(user)
+    return user

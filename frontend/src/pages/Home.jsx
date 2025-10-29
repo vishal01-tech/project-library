@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "../assets/styles/Home.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import NavbarSidebar from "../components/NavbarSidebar";
 import Pagination from "../components/Pagination";
 import api from "../api/api";
@@ -9,38 +9,45 @@ import Footer from "../components/Footer";
 
 function Home() {
   const baseURL = api.defaults.baseURL;
+  const [searchParams, setSearchParams] = useSearchParams();
   const [books, setBooks] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
+  const [inputValue, setInputValue] = useState(searchQuery);
   const [userRole, setUserRole] = useState("user");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(
+    parseInt(searchParams.get("page")) || 1
+  );
   const [totalBooks, setTotalBooks] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [booksPerPage, setBooksPerPage] = useState(12);
+  const [booksPerPage, setBooksPerPage] = useState(
+    parseInt(searchParams.get("limit")) || 12
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
     // Get user role from cookie
-    const role = Cookies.get("email") || "user";
+    const role = Cookies.get("email") || "admin";
     setUserRole(role);
 
-    // Fetch books
-    fetchBooks();
-  }, []);
-
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      fetchBooks(1, searchQuery);
-    }, 500); // 500ms delay
-
-    // Cleanup function runs before next effect call
-    return () => clearTimeout(delayDebounce);
+    // Fetch books based on URL params
+    fetchBooks(currentPage, searchQuery);
   }, [searchQuery]);
 
   useEffect(() => {
-    // Refetch books when booksPerPage changes
-    fetchBooks(1, searchQuery);
-  }, [booksPerPage]);
+    setInputValue(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    // Update URL params when state changes
+    setSearchParams({
+      page: currentPage.toString(),
+      limit: booksPerPage.toString(),
+      search: searchQuery,
+    });
+  }, [currentPage, booksPerPage, searchQuery, setSearchParams]);
 
   const fetchBooks = async (page = 1, search = searchQuery) => {
     try {
@@ -63,6 +70,33 @@ function Home() {
       alert("Failed to fetch books.");
     }
   };
+
+  // Debounced search handler
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      setSearchQuery(value);
+      setCurrentPage(1);
+      setSearchParams({
+        page: "1",
+        limit: booksPerPage.toString(),
+        search: value,
+      });
+    }, 500),
+    [booksPerPage, setSearchParams]
+  );
+
+  const handleSearchChange = (e) => {
+    debouncedSearch(e.target.value);
+  };
+
+  // Debounce utility function
+  function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
 
   const handleDeleteBook = async (bookId) => {
     if (window.confirm("Are you sure you want to delete this book?")) {
@@ -96,13 +130,19 @@ function Home() {
               <input
                 type="text"
                 placeholder="Search books by title or author..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={inputValue}
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                  handleSearchChange(e);
+                }}
                 className="search-bar"
               />
               <select
                 value={booksPerPage}
-                onChange={(e) => setBooksPerPage(parseInt(e.target.value))}
+                onChange={(e) => {
+                  setBooksPerPage(parseInt(e.target.value));
+                  setCurrentPage(1);
+                }}
                 className="books-per-page-dropdown"
               >
                 <option value={12}>Select Books</option>
@@ -116,6 +156,9 @@ function Home() {
                 <option value={200}>200</option>
                 <option value={300}>300</option>
               </select>
+            </div>
+            <div className="addbooks">
+              <Link to="/managebooks">Add Books</Link>
             </div>
           </div>
           <div className="books-grid">

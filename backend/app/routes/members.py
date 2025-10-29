@@ -10,6 +10,7 @@ from app.utils.responses import success_response
 
 router = APIRouter(dependencies=[Depends(oauth2_scheme)])
 
+
 # POST add member
 @router.post("/addmember")
 def add_member(member: MemberCreate, db: Session = Depends(get_db)):

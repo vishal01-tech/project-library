@@ -9,7 +9,7 @@ class Users(Base):
     fullname = Column(String(100), nullable=False,unique=True)
     email = Column(String(100),nullable=False,unique=True)
     password = Column(String(255),nullable=False)
-    role = Column(String(50), nullable=False, default='user')
+    role = Column(String(50), nullable=False, default='admin')
     otp = Column(String(6), nullable=True)
     otp_expiry = Column(TIMESTAMP, nullable=True)
     created_at = Column(TIMESTAMP,default=func.now())

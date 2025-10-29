@@ -21,9 +21,9 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* margin-top: 100px ; */
     height: 550px;
     margin-left: 350px;
+    margin-top: -20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 
 }
@@ -94,4 +94,13 @@ p {
 
 span {
     color: red !important;
+}
+
+/* Mobile mode */
+@media screen and (max-width: 767px) {
+    .add-member-form{
+        width: 250px;
+        margin-left: 310px;
+    }
+
 }

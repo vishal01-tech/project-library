@@ -229,29 +229,10 @@ select {
     transform: translateY(-1px);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .manage-container {
-        padding: 10px;
+/* Mobile mode */
+@media screen and (max-width: 767px) {
+    .add-books{
+        width: 300px;
     }
 
-    .add-books {
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    .book-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    .book-actions {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .book-details {
-        width: 100%;
-    }
 }

@@ -71,8 +71,6 @@
 .third h2 {
   font-size: 1.2rem;
   color: white;
-
-  /* color: black; */
   margin-bottom: 8px;
   margin-right: 110px;
 }
@@ -80,8 +78,6 @@
 .third a {
   text-decoration: none;
   color: white;
-
-  /* color: black; */
   margin-bottom: 6px;
   transition: 0.3s;
 }
@@ -94,11 +90,9 @@
   margin-right: 40px;
 }
 
-.fourth h2{
+.fourth h2 {
   font-size: 1.1rem;
   color: white;
-
-  /* color: black; */
   margin-bottom: 8px;
 }
 
@@ -122,34 +116,41 @@
   margin-right: 850px;
 }
 
-
 .fifth h2 {
   font-size: 0.9rem;
-  /* color: black; */
   color: white;
-
 }
 
-@media (max-width: 1024px) {
+/* Mobile mode */
+@media screen and (max-width: 767px) {
   .footer-container {
+    width: 70%;
+    height:60vh;
+  }
+  .first p{
+    margin-left: 100px;
     flex-direction: column;
-    align-items: center;
   }
-
-  .first,
-  .second,
-  .third,
-  .fourth {
-    margin: 20px 0;
-    width: 100%;
-    text-align: center;
-  }
-
-  .social-icons {
-    justify-content: center;
-  }
-
-  .fifth {
+  .first h2 {
     flex-direction: column;
+  }
+  .second a,
+  .second h2 {
+    flex-direction: column;
+  }
+  .third a,
+  .third h2 {
+    margin-top: 0px;
+    margin-left: 0px;
+    flex-direction: column;
+  }
+  .fourth h2{
+    margin-top: 200px;
+    margin-left: -300px;
+    flex-direction: column;
+  }
+  .social-icons{
+    margin-left: -300px;
+    margin-top: -0px;
   }
 }

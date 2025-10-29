@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children, isAuthRequired = true }) => {
       // If auth required but no token, redirect to login
       navigate("/");
     } else if (!isAuthRequired && token) {
-      // If no auth required but token exists (e.g., login page), redirect to home
+      // If no auth required but token exists redirect to home
       navigate("/home");
     }
   }, [token, isAuthRequired, navigate]);
@@ -21,7 +21,7 @@ const ProtectedRoute = ({ children, isAuthRequired = true }) => {
     return null;
   }
 
-  // If no auth required but token exists, don't render (will redirect)
+  // If no auth required but token exists, don't render
   if (!isAuthRequired && token) {
     return null;
   }

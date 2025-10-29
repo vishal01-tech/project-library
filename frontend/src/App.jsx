@@ -13,6 +13,7 @@ import ReturnBooks from "./pages/return_books";
 import NotFound from "./pages/NotFound";
 import MemberList from "./pages/MemberList";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminList from "./pages/AdminList";
 
 function App() {
   return (
@@ -110,6 +111,11 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/adminlist" element={
+          <ProtectedRoute>
+            <AdminList />
+          </ProtectedRoute>
+        }/>
 
         <Route path="*" element={<NotFound />} />
       </Routes>

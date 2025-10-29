@@ -81,6 +81,7 @@ function Login() {
       }); // 3 hours
       Cookies.set("email", response.data.data.email, { expires: 3 / 24 }); // 3 hours
       Cookies.set("username", response.data.data.username, { expires: 3 / 24 }); // 3 hours
+      Cookies.set("role", response.data.data.role, { expires: 3 / 24 }); // 3 hours
 
       // Show a success toast
       toast.success("Login successful..");
@@ -120,7 +121,7 @@ function Login() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => handleChange(e, "email")}
-              onBlur={(e) => handleBlur(e, "email")}  
+              onBlur={(e) => handleBlur(e, "email")}
             />
             {errors.email && (
               <span className="error-message">{errors.email}</span>
