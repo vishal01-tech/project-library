@@ -103,6 +103,7 @@ function NavbarSidebar({ userRole }) {
           >
             📋 Borrowed Books
           </Link>
+          <Link to="/members" className={`sidebar-link ${location.pathname === "/members" ? "active" : ""}`}> 🧑‍💼 Members List</Link>
           {(userRole === "super_admin" ||
             Cookies.get("email") === "admin@gmail.com") && (
             <Link

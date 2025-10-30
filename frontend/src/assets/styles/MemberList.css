@@ -108,3 +108,42 @@ span {
   color: #333;
   font-size: 1rem;
 }
+.search-and-dropdown .search-bar {
+  width: 300px;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.search-and-dropdown .search-bar:focus {
+  border-color: #3498db;
+}
+
+.search-bar{
+  width: 600px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 250px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.search-and-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.search-bar input {
+  background-color: white;
+}
+
+.search-bar:focus {
+  border-color: #34495e;
+}
+

@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import MemberList from "./pages/MemberList";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminList from "./pages/AdminList";
+import Members from "./pages/Members";
 
 function App() {
   return (
@@ -79,6 +80,12 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/members" element={
+          <ProtectedRoute>
+            <Members/>
+          </ProtectedRoute>
+        }
+        />
         <Route
           path="/issuebooks"
           element={
@@ -103,6 +110,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/signup"
           element={

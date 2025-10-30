@@ -34,7 +34,7 @@ function Home() {
 
     // Fetch books based on URL params
     fetchBooks(currentPage, searchQuery);
-  }, [searchQuery]);
+  }, [currentPage, searchQuery, booksPerPage]);
 
   useEffect(() => {
     setInputValue(searchQuery);
@@ -126,7 +126,7 @@ function Home() {
         <div className="main-content">
           <div className="header-row">
             <h2>All Books</h2>
-            <div className="search-and-dropdown">
+            <div className="search-and-dropdown-home">
               <input
                 type="text"
                 placeholder="Search books by title or author..."
@@ -135,7 +135,7 @@ function Home() {
                   setInputValue(e.target.value);
                   handleSearchChange(e);
                 }}
-                className="search-bar"
+                className="search-bar-home"
               />
               <select
                 value={booksPerPage}
@@ -145,7 +145,7 @@ function Home() {
                 }}
                 className="books-per-page-dropdown"
               >
-                <option value={12}>Select Books</option>
+                <option value={12}>Books Per Page</option>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={30}>30</option>
@@ -158,7 +158,7 @@ function Home() {
               </select>
             </div>
             <div className="addbooks">
-              <Link to="/managebooks">Add Books</Link>
+              <Link to="/managebooks"> ➕ Add Books</Link>
             </div>
           </div>
           <div className="books-grid">

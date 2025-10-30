@@ -87,7 +87,7 @@ body {
   color: white !important;
 }
 
-.search-bar {
+.search-bar-home{
   width: 600px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -97,18 +97,18 @@ body {
   transition: border-color 0.3s;
 }
 
-.search-and-dropdown {
+.search-and-dropdown-home {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
 
-.search-bar input {
+.search-bar-home input {
   background-color: white;
 }
 
-.search-bar:focus {
+.search-bar-home:focus {
   border-color: #34495e;
 }
 
@@ -223,7 +223,7 @@ body {
   }
 }
 
-.search-and-dropdown .search-bar {
+.search-and-dropdown-home .search-bar-home {
   width: 300px;
   padding: 10px 15px;
   border: 1px solid #ddd;
@@ -233,7 +233,7 @@ body {
   transition: border-color 0.3s;
 }
 
-.search-and-dropdown .search-bar:focus {
+.search-and-dropdown-home .search-bar-home:focus {
   border-color: #3498db;
 }
 

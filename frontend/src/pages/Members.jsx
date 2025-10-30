@@ -2,13 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import NavbarSidebar from "../components/NavbarSidebar";
 import Pagination from "../components/Pagination";
-import "../assets/styles/AdminList.css";
+import "../assets/styles/MemberList.css";
 import api from "../api/api";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 
-function AdminList() {
-  const [users, setUsers] = useState([]);
+function Members() {
+  const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,32 +17,28 @@ function AdminList() {
   const [currentPage, setCurrentPage] = useState(
     parseInt(searchParams.get("page")) || 1
   );
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [limit, setLimit] = useState(10);
+  const [totalMembers, setTotalMembers] = useState(0);
+  const [limit, setLimit] = useState(parseInt(searchParams.get("limit")) || 10);
 
   useEffect(() => {
     const email = Cookies.get("email");
     setUserEmail(email);
-    if (email === "admin@gmail.com") {
-      fetchUsers();
-    } else {
-      setLoading(false);
-    }
-  }, [currentPage, search]);
+    fetchMembers();
+  }, [currentPage, search, limit]);
 
   useEffect(() => {
     setInputValue(search);
   }, [search]);
 
-  const fetchUsers = async () => {
+  const fetchMembers = async () => {
     try {
       const params = { page: currentPage, limit, search };
-      const response = await api.get("/users", { params });
-      setUsers(response.data.data.users);
-      setTotalUsers(response.data.data.total);
+      const response = await api.get("/members", { params });
+      setMembers(response.data.data);
+      setTotalMembers(response.data.total);
     } catch (error) {
-      console.error("Failed to fetch users:", error);
-      toast.error("Failed to fetch users");
+      console.error("Failed to fetch members:", error);
+      toast.error("Failed to fetch members");
     } finally {
       setLoading(false);
     }
@@ -50,7 +46,7 @@ function AdminList() {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    setSearchParams({ page: page.toString(), search });
+    setSearchParams({ page: page.toString(), search, limit: limit.toString() });
   };
 
   // Debounced search handler
@@ -58,9 +54,9 @@ function AdminList() {
     debounce((value) => {
       setSearch(value);
       setCurrentPage(1);
-      setSearchParams({ page: "1", search: value });
+      setSearchParams({ page: "1", search: value, limit: limit.toString() });
     }, 500),
-    []
+    [limit]
   );
 
   const handleSearchChange = (e) => {
@@ -76,14 +72,14 @@ function AdminList() {
     };
   }
 
-  const totalPages = Math.ceil(totalUsers / limit);
+  const totalPages = Math.ceil(totalMembers / limit);
 
   return (
     <>
       <NavbarSidebar userEmail={userEmail} />
       <div className="main">
-        <div className="admin-list">
-          <h3>Admin List</h3>
+        <div className="member-list">
+          <h3>Members List</h3>
           <div className="search-and-dropdown">
             <input
               type="text"
@@ -99,11 +95,11 @@ function AdminList() {
               onChange={(e) => {
                 setLimit(parseInt(e.target.value));
                 setCurrentPage(1);
-                setSearchParams({ page: "1", search });
+                setSearchParams({ page: "1", search, limit: e.target.value });
               }}
-              className="users-per-page-dropdown"
+              className="members-per-page-dropdown"
             >
-              <option value={10}>Admins Per Page</option>
+              <option value={10}>Members Per Page</option>
               <option value={10}>10</option>
               <option value={20}>20</option>
               <option value={30}>30</option>
@@ -121,21 +117,23 @@ function AdminList() {
                 <th>S.No.</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Role</th>
+                <th>Phone</th>
+                <th>Address</th>
               </tr>
             </thead>
             <tbody>
-              {users.length === 0 ? (
+              {members.length === 0 ? (
                 <tr>
-                  <td colSpan="5">No admin found</td>
+                  <td colSpan="5">No members found</td>
                 </tr>
               ) : (
-                users.map((user, index) => (
-                  <tr key={user.id}>
+                members.map((member, index) => (
+                  <tr key={member.id}>
                     <td>{(currentPage - 1) * limit + index + 1}</td>
-                    <td>{user.fullname}</td>
-                    <td>{user.email}</td>
-                    <td>{user.role}</td>
+                    <td>{member.name}</td>
+                    <td>{member.email}</td>
+                    <td>{member.phone}</td>
+                    <td>{member.address}</td>
                   </tr>
                 ))
               )}
@@ -154,4 +152,4 @@ function AdminList() {
   );
 }
 
-export default AdminList;
+export default Members;
